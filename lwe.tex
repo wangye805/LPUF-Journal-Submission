@@ -1,4 +1,4 @@
-\section{ML Resistance of LWE Decryption Functions}
+\section{ML Resistance of LWE Decryption Functions  (Lattice PUF): Proof}
 \label{sec:lwe}
 %\textcolor{red}{This section formally defines ML resistance of strong PUFs via the notion of PAC learning and shows why LWE decryption functions are attractive for constructing post-quantum ML-resistant PUFs. In this section, we focus on passive attacks in which the attacker can observe the challenges sent to the verifier but is unable to generate challenges of his or her choice.}
 
@@ -6,12 +6,12 @@
 A strong PUF can be modeled as a function $f:\mathcal{C}\rightarrow \mathcal{R}$ mapping from the challenge space $\mathcal{C}$ (usually $\{0,1\}^n$) to the response space $\mathcal{R}$ (usually $\{0,1\}$).
 We call $f$ the true model of a strong PUF since it captures the exact challenge-response behavior. 
 
-ML attacks are usually performed by relying on a functional class of candidate models, collecting CRPs as the training data, and running a learning algorithm to obtain a model from the candidate class which best approximates the true model. In addition to the approximation quality, the criteria of evaluating the effectiveness and efficiency of the learning algorithm also include the sample and time complexity. 
+ML attacks are usually performed by relying on a functional class of candidate models, collecting CRPs as the training data, and running a learning algorithm to obtain a model from the candidate class which best approximates the true model. %In addition to the approximation quality, the criteria of evaluating the effectiveness and efficiency of the learning algorithm also include the sample and time complexity. 
 To claim that a strong PUF is easy to learn, one can propose a learning algorithm which finds a CRP model with good approximation quality using a small number of sample CRPs and terminates in a short time.
 The converse is difficult: 
 to claim that a PUF is hard to learn, one must show that all possible learning algorithms fail to provide models with good approximation quality, or they require a large number of CRPs or a long running time.
 
-We argue that the only known framework for seeking a provable notion of ML resistance with a formal analysis of approximation quality, sample size, and time complexity is the PAC learning model \cite{mohri2012foundations}.
+ PAC learning is a known and widely adopted framework for seeking a provable notion of ML resistance with a formal analysis of approximation quality, sample size, and time complexity\footnote{We note that other tools, in addition to PAC theory, for studying ML resistance exist, for example, statistical learning framework \cite{mohri2012foundations}.} \cite{mohri2012foundations}.
 We now formalize the passive modeling attack scenario in the context of PAC learning.
 A PAC-term for a true model $f$ of a strong PUF is a concept.
 Denote as $\mathcal{F}$ the set of all possible PUF-realized functions (every instance of a PUF creates its unique functional mapping $f$).
@@ -27,12 +27,14 @@ We say a set $\mathcal{F}$ of strong PUFs is PAC-learnable using $\mathcal{H}$, 
 \end{equation*}
 
 In conclusion, our strategy is to say that a strong PUF is ML-resistant if it is not PAC-learnable (i.e., that it is PAC-hard). 
-PAC-hardness implies that any successful ML attack requires at least an exponential running time. 
+PAC-hardness implies that any successful ML attack requires at least an exponential running time. (We note that PAC theory was used in prior work on PUFs. In \cite{pac_learn_interpose_puf, tamper_proof_sunar, strong_ml_attack_ganji}, the PAC theory was used to show that some PUFs are learnable under the PAC framework. In contrast, we use the PAC framework to establish security guarantees against modeling attacks on a PUF.)
 
 \subsection{Decryption Functions Are not PAC Learnable}
-What is critically important is that there exist functions that are known to be not PAC-learnable. 
-Specifically, a class of decryption functions of secure public-key cryptosystems is not PAC-learnable, as established by \cite{kearns1994cryptographic,klivans2006cryptographic}. 
-We outline their proof below.
+%What is critically important is that there exist functions that are known to be not PAC-learnable. 
+%Specifically, a class of decryption functions of secure public-key cryptosystems is not PAC-learnable, as established by \cite{kearns1994cryptographic,klivans2006cryptographic}. 
+%We outline their proof below.
+
+A class of decryption functions of secure public-key cryptosystems has been shown to be not PAC-learnable \cite{kearns1994cryptographic,klivans2006cryptographic}. The proof is outlined below.
 
 A public-key cryptosystem is a triple of probabilistic polynomial-time algorithms $(\Gen,\Enc,\Dec)$ such that:
 (1) $\Gen$ takes $n$ as a security parameter and outputs a pair of keys $(pk,sk)$, the public and private keys respectively;
@@ -135,3 +137,5 @@ The probability of the error is given by \cite{micciancio2009lattice}:
 \end{align*}
 in which $\Phi(\cdot)$ is the cumulative distribution function of the standard Gaussian variable. 
 We later use this expression to find the practical parameters for the lattice PUF.
+
+%\textcolor{red}{With the above, we proved ML resistance of the LWE decryption functions. As we will show in Section \ref{sec:design}, the lattice PUF directly builds upon a LWE decryption function. The above and the construction specifics in Section \ref{sec:lwe_dec} and Section \ref{sec:lfsr} together proves the ML resistance of lattice PUF.}

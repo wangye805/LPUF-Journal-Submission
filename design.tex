@@ -2,7 +2,7 @@
 \label{sec:design}
 \begin{figure}[t!]
     \centering
-    \includegraphics[width = 1.0\linewidth]{./figs/top_level_arch.pdf}    \caption{Top-level architecture and data flow of the lattice PUF.}
+    \includegraphics[width = 1.0\linewidth]{./figs/top_level_arch_redraw.pdf}    \caption{Top-level architecture and data flow of the lattice PUF.}
     \label{fig:fpga_impl}
 \end{figure}
 %\textcolor{red}{The theoretical security guarantees in Section \ref{sec:lwe} shows that an LWE decryption function can be used as a strong PUF with challenges generated from a ciphertext distribution. 
@@ -22,7 +22,7 @@ The top-level architecture of the proposed lattice PUF is shown in Figure \ref{f
     \label{fig:lwedec}
 \end{figure}
 
-Figure \ref{fig:lwedec} shows the core component of the proposed lattice PUF: the LWE decryption function. 
+Figure \ref{fig:lwedec} shows the architecture of LWE decryption function. 
 It takes a binary challenge vector $\mathbf{c} = \{c_0,c_1,\ldots,c_{N-1}\}$ of size $N = (n+1)\log q$ which maps to a ciphertext $(\mathbf{a},b)$ in the following way:
 \begin{align*}
 a_i &= \sum_{j=0}^{\log q-1}c_{(i-1)\log q+j}2^j,\; \forall i\in \{1,2,\ldots,n\}, \\
@@ -72,8 +72,9 @@ This motivates the need to decrease $n$.
 %\label{fig:1_bit_hw}
 %\end{figure}
 
-For conventional PUFs, such as APUF and SRAM PUF, an output error is due to environmental noise, e.g. delay changes in APUF and FET strength changes in SRAM PUF with both voltage and temperature.
-In contrast, output errors of the lattice PUF come from two sources: (1) environmental errors of secret bits, and (2) errors of decryption during response generation.
+%For conventional PUFs, such as APUF and SRAM PUF, an output error is due to environmental noise, e.g. delay changes in APUF and FET strength changes in SRAM PUF with both voltage and temperature.
+%In contrast, 
+Output errors of the lattice PUF come from two sources: (1) environmental errors of secret bits, and (2) errors of decryption during response generation.
 The former can be thought as the failure of key reconstruction in POKs.
 Figure \ref{fig:1_bit_hw} shows the hamming-distance between CRPs generated using error-free POKs and POKs with 1 bit error.
 Since a single bit-flip completely changes the challenge-response behavior of LWE decryption function, the failure rate of key reconstruction needs to be low, e.g. $10^{-6}$ (as widely adopted in other PUF applications \cite{maes2012pufky}).
@@ -113,12 +114,15 @@ By setting $n=160$, $q=256$, $m=256$ and $\alpha = 2.20\%$, we achieve a lattice
 
 In order to get a $1$-bit response, $(n+1)\log q = 1288$ bits need to be sent to the lattice PUF as a challenge.
 For direct authentication applications, usually around $100$ bits of responses are required. Therefore, the direct implementation described so far would require $C = 128.8K$ challenge bits.
-This high ratio of challenge length to response length limits its practical use in many scenarios when communication is expensive. 
+This high ratio of challenge length to response length limits its practical use in many scenarios when communication is expensive.
+
+%\textcolor{red}{A class of attacks which manipulates public helper data to exploit PUF generated keys can compromise PUF security \cite{helper_data_manipulation}. Such attacks apply to pairing-based PUFs (for instance, RO PUFs), and require public access to helper data. However, such attacks may not be applicable to our construction, since our POK is based on the SRAM PUF, which follows a completely different mechanism. In addition, the possibility of the attacks can be reduced by limiting public access to helper data. Therefore, the helper data manipulation attack is not a major concern for our design.}
+
 
 \vspace{-0.5em}
 \subsection{Challenge Compression through Distributional Relaxation}
 \label{sec:lfsr}
-We now describe the proposed strategy based on space-efficient LWE that overcomes the limitation on communication inefficiency.
+%We now describe the proposed strategy based on space-efficient LWE that overcomes the limitation on communication inefficiency.
 The LWE decryption function described in Section \ref{sec:lwe_dec} requires a challenge $\mathbf{c}$ in the form $\mathbf{c}=(\mathbf{a},b)$ to be sent from the server to the PUF. 
 To represent vector $\mathbf{a} \in \mathbb{Z}_q^n$ requires $n\log q$ bits while to represent scalar $b \in \mathbb{Z}_q$  requires only $\log q$ bits. 
 Thus, the major cost of transmission lies in sending $\mathbf{a}$. 
@@ -186,14 +190,14 @@ $100$ bits of responses now require only transmitting $256+100\times\log 256 = 1
 
 \subsection{Countermeasure for Active Attack}
 \label{sec:counter}
-The focus of the paper is a PUF secure against passive attacks in which the observed challenges can be used to derive an internal model of the PUF. 
-However, the LWE decryption function is vulnerable to an active attack that supplies arbitrary input challenges. 
-(As we show, this risk also carries into an LFSR-based variant). 
+%The focus of the paper is a PUF secure against passive attacks in which the observed challenges can be used to derive an internal model of the PUF. 
+%However, the LWE decryption function is vulnerable to an active attack that supplies arbitrary input challenges. 
+%(As we show, this risk also carries into an LFSR-based variant). 
 
-The attack is premised on the ability to supply arbitrary challenges (ciphertexts) as inputs to the decryption function. 
+We now demonstrate an active attack that compromises security of lattice PUF. The attack is premised on the ability to supply arbitrary challenges (ciphertexts) as inputs to the decryption function. 
 The attack proceeds as follows. 
 The attacker fixes $\mathbf{a}$ and enumerates all possible $b\in \mathbb{Z}_q$ for challenge $\mathbf{c} = (\mathbf{a},b)$.
-As $b$ increases from $0$ to $q-1$, the response $r = Q(b-\innerprod{\mathbf{a},\mathbf{b}})$ changes from  $Q(b-\innerprod{\mathbf{a},\mathbf{s}}) = 0$ to $Q(b+1-\innerprod{\mathbf{a},\mathbf{s}}) = 1$ exactly when $b$ satisfies
+As $b$ increases from $0$ to $q-1$, the response $r = Q(b-\innerprod{\mathbf{a},\mathbf{s}})$ changes from  $Q(b-\innerprod{\mathbf{a},\mathbf{s}}) = 0$ to $Q(b+1-\innerprod{\mathbf{a},\mathbf{s}}) = 1$ exactly when $b$ satisfies
 \begin{equation*}
 b-\innerprod{\mathbf{a},\mathbf{s}} = q/4.
 \end{equation*}
@@ -207,10 +211,11 @@ By repeating this procedure $n$ times, the attacker is able to set up $n$ linear
     & \cdots \\
     \innerprod{\mathbf{a}_{n-1},\mathbf{s}} &= \hat{b}_{n-1} - q/4.
 \end{align*}
-Gaussian elimination can then be used to solve for $\mathbf{s}$. 
-The reason the attack succeeds is that attackers are able to fix $\mathbf{a}$ and use it for multiple values of $b$. 
+Gaussian elimination can then be used to solve for $\mathbf{s}$, entailing compromising the system. 
+%The reason the attack succeeds is that attackers are able to fix $\mathbf{a}$ and use it for multiple values of $b$. 
 
-We overcome the risk of such an attack by adopting the technique in \cite{yu2016lockdown}: we  introduce a self-incrementing counter to embed the counter value into a challenge seed. 
+%We overcome the risk of such an attack by adopting the technique in \cite{yu2016lockdown}: we introduce a self-incrementing counter to embed the counter value into a challenge seed.
+To defend against the attack, we introduce a self-incrementing counter to embed the counter value into a challenge seed \cite{yu2016lockdown}.
 This makes the attack impossible as the counter restricts the attacker's ability to completely control input challenges to the LWE decryption function.
 As a result, the attacker cannot enumerate all values of $b$ while keeping $\mathbf{a}$ unchanged. 
 As shown in Figure \ref{fig:fpga_impl}, the concatenation of the challenger-provided seed and the counter value $t$ (i.e. $\text{seed}_{\mathbf{a}'}||t$) is used as the seed for generating $\mathbf{a}$. 
@@ -329,17 +334,19 @@ However, the MAC unit parallelization cannot achieve arbitrary parallelism since
 
 \begin{figure}[t!]
 \centering
-\includegraphics[width = 0.8\linewidth]{./figs/protocol}
+\includegraphics[width = 0.9\linewidth]{./figs/protocol}
 \caption{End-to-end authentication method with the lattice PUF.}
 \label{fig:protocol}
 \end{figure}
 
 \subsection{Application Scenario and Reverse Fuzzy Extractor}
 
-To reconstruct stable POK bits, we adopt the fuzzy extractor (FE) \cite{dodis2004fuzzy} method to achieve a low failure rate. To reduce device-side complexity of design, we use a reverse fuzzy extractor (RFE) that moves the complex error correction process from the device to the server \cite{van2012reverse, xi2018fresh}. As an example application, we study using the lattice PUF in a string-matching authentication scheme \cite{suh2007physical}.
+To reconstruct stable POK bits, we adopt the fuzzy extractor (FE) \cite{bosch2008efficient} method to achieve a low failure rate. To reduce device-side complexity of design, we use a reverse fuzzy extractor (RFE) that moves the complex error correction process from the device to the server \cite{van2012reverse}. As an example application, we study using the lattice PUF in a string-matching authentication scheme \cite{suh2007physical}.
 
 Figure \ref{fig:authen_system} shows the building blocks of an authentication scheme based on the lattice PUF. The device contains a POK generator, an RFE generation block (\texttt{RFE.Gen}), and a lattice PUF. The server has a database (\texttt{DB}) to store the POK, an RFE reconstruction block (\texttt{RFE.Rec}), and a server-side lattice PUF.
 
 Our threat model assumes that the device operates in the field and is the target of ML attacks. We consider the server to be in a physically secure location, with the \texttt{DB} storing the POK bits and the sever-side lattice PUF being secret. %The adversary can eavesdrop on $ch$, $\mathbf{h}$, $r_R$. The RFE construction guarantees that there is sufficient left-over entropy on the secret key, and so disclosing helper data $\mathbf{h}$ is secure against state-of-the-art attacks \cite{delvaux2016efficient}.
 
 Figure \ref{fig:protocol} shows the operations of an end-to-end authentication method using the lattice PUF. During the enrollment phase, the server reads out the POK $\mathbf{s}$ from the SRAM cells through a one-time interface, and stores it in the server \texttt{DB}. During each authentication, the error correction uses the code-offset construction with a concatenated code. Here the secret $\mathbf{t}$ is a nonce, which is encoded into a codeword $\mathbf{k}$ and then XORed with the SRAM bits $\mathbf{s}_R$ to produce the helper data $\mathbf{h}$. The server reverses these steps using the enrolled POK $\mathbf{s}$. If the HD between $\mathbf{s}$ and $\mathbf{s}_R$ is within the error-decoding capability of the ECC decoder, the server reconstructs the correct secret key $\mathbf{t}$. Finally, the server sends the challenge $ch=(\text{seed}_{\mathbf{a}^\prime}, \mathbf{b}')$ to the device. The device generates the PUF response $\mathbf{r}_R$ and sends it to the server. The server compares $\mathbf{r}_R$ with the response $\mathbf{r}$ generated from the server-side lattice PUF. The device will be accepted if $\text{HD}(\mathbf{r}_R, \mathbf{r})$ is less than a threshold $th$.
+
+%\textcolor{red}{A class of attacks which manipulates public helper data to exploit PUF generated keys can compromise PUF security \cite{helper_data_manipulation}. Such attacks apply to pairing-based PUFs (for instance, RO PUFs), and require public access to helper data. However, such attacks may not be applicable to our construction, since our POK is based on the SRAM PUF, which follows a completely different mechanism. In addition, the possibility of the attacks can be reduced by limiting public access to helper data. Therefore, the helper data manipulation attack is not a major focus for our design.}

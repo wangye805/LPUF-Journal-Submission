@@ -1,7 +1,4 @@
 \section{Conclusion}
 \label{sec:conclusion}
-In this paper, we described a new strong physical unclonable function (PUF) that is provably secure against machine learning (ML) attacks with both classical and quantum computers. 
-The security is derived from cryptographic hardness of learning decryption functions of semantically secure public-key cryptosystems within the probably approximately correct  framework.
-The proposed PUF realizes the decryption function of the learning-with-errors (LWE) public-key cryptosystem as the core block. 
-We implemented a series of lattice PUF design, including a resource-efficient design and a latency-optimized design, on a Spartan 6 FPGA. The design realizes a challenge-response pair space of size $2^{136}$, requires $1280$ physically obfuscated key bits, and guarantees $128$-bit ML resistance. 
-The PUF shows excellent uniformity, uniqueness, and reliability. 
+
+We propose a novel strong PUF with theoretically proven security against ML attacks conducted by both classical and quantum computers. Its security is guaranteed by the cryptographic hardness to learn decryption functions of public key cryptosystems. Our PUF is constructed from the LWE decryption function block. A series of designs are implemented on a Xilinx Spartan-6 FPGA. A compact design uses a highly serialized LFSR and LWE decryption function, while a latency-optimized design uses an unrolled LFSR and a parallel datapath. The lattice PUF designs have a CRP space of $2^{136}$, with $6,360$ POK bits and $128$-bit concrete ML resistance. Excellent statistical characteristics are demonstrated.   
