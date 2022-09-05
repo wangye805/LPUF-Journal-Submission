@@ -1,0 +1,209 @@
+\pdfoutput=1
+%\documentclass[letterpaper, conference]{IEEEtran}
+\documentclass[9.5pt,journal,compsoc]{IEEEtran}
+%\usepackage[a4paper, total={7.875in, 10.75in}]{geometry}
+%\usepackage[letterpaper, left=0.625in, right=0.625in, bottom=0.7in, top=0.7in]{geometry}
+\IEEEoverridecommandlockouts
+
+\usepackage[utf8]{inputenc}
+\DeclareUnicodeCharacter{03B2}{\ensuremath{\beta}}
+
+\usepackage{amsmath}
+\usepackage{amsthm}
+\usepackage{amssymb}
+% \usepackage{epstopdf}%for adding the epstopdf file
+\usepackage{comment}
+\usepackage{graphicx}
+%\usepackage{subfigure}
+\usepackage{gensymb}
+\usepackage{textcomp}
+%\usepackage{subcaption}
+%\usepackage{subfigure}
+%\captionsetup{compatibility=false}
+\usepackage{caption}
+\usepackage{algorithm}
+\usepackage{algpseudocode}
+\usepackage{csvsimple}
+\usepackage{array}
+\usepackage{flushend}
+\usepackage{balance}
+\usepackage{multirow}
+\usepackage{mathtools}
+\usepackage{bm}
+\usepackage{xcolor}
+\usepackage{soul}
+\usepackage{diagbox}
+\usepackage{tablefootnote}
+
+%DIF PREAMBLE EXTENSION ADDED BY LATEXDIFF
+%DIF UNDERLINE PREAMBLE %DIF PREAMBLE
+\RequirePackage[normalem]{ulem} %DIF PREAMBLE
+\RequirePackage{color}\definecolor{RED}{rgb}{1,0,0}\definecolor{BLUE}{rgb}{0,0,1} %DIF PREAMBLE
+\providecommand{\DIFadd}[1]{{\protect\color{blue}\uwave{#1}}} %DIF PREAMBLE
+\providecommand{\DIFdel}[1]{{\protect\color{red}\sout{#1}}}                      %DIF PREAMBLE
+%DIF SAFE PREAMBLE %DIF PREAMBLE
+\providecommand{\DIFaddbegin}{} %DIF PREAMBLE
+\providecommand{\DIFaddend}{} %DIF PREAMBLE
+\providecommand{\DIFdelbegin}{} %DIF PREAMBLE
+\providecommand{\DIFdelend}{} %DIF PREAMBLE
+%DIF FLOATSAFE PREAMBLE %DIF PREAMBLE
+\providecommand{\DIFaddFL}[1]{\DIFadd{#1}} %DIF PREAMBLE
+\providecommand{\DIFdelFL}[1]{\DIFdel{#1}} %DIF PREAMBLE
+\providecommand{\DIFaddbeginFL}{} %DIF PREAMBLE
+\providecommand{\DIFaddendFL}{} %DIF PREAMBLE
+\providecommand{\DIFdelbeginFL}{} %DIF PREAMBLE
+\providecommand{\DIFdelendFL}{} %DIF PREAMBLE
+%DIF END PREAMBLE EXTENSION ADDED BY LATEXDIFF
+
+\usepackage[caption=false, font=footnotesize]{subfig}
+\captionsetup*[table]{position=top}
+\captionsetup*[subtable]{position=top}
+\captionsetup*[figure]{position=bottom}
+\captionsetup*[subfigure]{position=bottom}
+
+\usepackage[bookmarks=false]{hyperref}
+\hypersetup{
+    colorlinks = true,
+    citecolor  = blue,
+    linkcolor  = blue,
+    urlcolor   = blue,
+}
+
+\DeclarePairedDelimiter\ceil{\lceil}{\rceil}
+\DeclarePairedDelimiter\floor{\lfloor}{\rfloor}
+\DeclarePairedDelimiter\abs{\lvert}{\rvert}
+%\newcommand{\degree}{\ensuremath{^\circ}}
+\newcommand{\Expect}{{\rm I\kern-.3em E}}
+%\newcommand{\argmin}{\operatornamewithlimits{argmin}}
+\newcommand{\Enc}{\operatornamewithlimits{Enc}}
+\newcommand{\Var}{\operatornamewithlimits{Var}}
+\newcommand{\rank}{\operatornamewithlimits{rank}}
+\newcommand{\HW}{\operatornamewithlimits{HW}}
+\newcommand{\HD}{\operatornamewithlimits{HD}}
+\newcommand{\diag}{\operatornamewithlimits{diag}}
+\newcommand{\card}{\operatornamewithlimits{card}}
+\newcommand{\dist}{\operatornamewithlimits{dist}}
+\newcommand{\nnz}{\operatornamewithlimits{nnz}}
+\newcommand{\LFSR}{\operatornamewithlimits{LFSR}}
+\newcommand{\trun}{\operatornamewithlimits{trun}}
+\newcommand{\Gen}{\operatornamewithlimits{Gen}}
+\newcommand{\Dec}{\operatornamewithlimits{Dec}}
+\newcommand{\BER}{\operatornamewithlimits{BER}}
+\newcommand{\PubK}{\operatornamewithlimits{PubK}}
+\newcommand{\negl}{\operatornamewithlimits{negl}}
+\newcommand{\sign}{\operatornamewithlimits{sign}}
+\providecommand{\norm}[1]{\lVert#1\rVert}
+\providecommand{\innerprod}[1]{\langle#1\rangle}
+
+\DeclareMathOperator{\di}{d\!}
+\DeclareMathOperator*{\argmin}{arg\,min}
+\DeclareMathOperator*{\argmax}{arg\,max}
+\DeclareMathOperator{\sgn}{sgn}
+\newcommand{\dprime}{{\prime\prime}}
+\newtheorem{theorem}{Theorem}
+\newtheorem{definition}{Definition}
+\newtheorem{lemma}{Lemma}
+
+\begin{document}
+\setstcolor{red}
+
+%\vspace{11.5pt}
+
+\title{A Provably Secure Strong PUF based on LWE: Construction and Implementation}
+
+\author{Xiaodan Xi\textsuperscript{*}, Ge Li\textsuperscript{*}, Ye Wang, and Michael Orshansky
+
+\IEEEcompsocitemizethanks{\IEEEcompsocthanksitem The authors are with the Department of Electrical and Computer Engineering, The University of Texas at Austin, Austin, TX, 78712, USA.\protect\\
+E-mail: paul.xiaodan@utexas.edu; lige@utexas.edu; lhywang@utexas.edu; orshansky@utexas.edu
+\IEEEcompsocthanksitem *Xiaodan Xi and Ge Li are co-first authors.
+}
+\thanks {© 2022 IEEE.  Personal use of this material is permitted.  Permission from IEEE must be obtained for all other uses, in any current or future media, including reprinting/republishing this material for advertising or promotional purposes, creating new collective works, for resale or redistribution to servers or lists, or reuse of any copyrighted component of this work in other works.}}
+
+\IEEEtitleabstractindextext{%
+%\begin{abstract}
+%Machine learning (ML) modeling attacks are a known threat to strong physical unclonable functions (PUFs). We construct a strong PUF with provable security against ML attacks conducted by both classical and quantum computers. Security is guaranteed by cryptographic hardness of learning decryption functions of public-key cryptosystems. Our construction is based on the hardness of the learning-with-errors (LWE) problem defined on integer lattices. Due to the fundamental connection of LWE to lattice problems, we call our construction the lattice PUF.
+
+%We construct lattice PUF with a physically obfuscated key (POK), an LWE decryption function block, and a linear-feedback shift register (LFSR). The POK provides the secret key of the LWE decryption function, and the LFSR produces the full length challenge from a small challenge seed. A lightweight reverse fuzzy extractor (RFE) is adopted to ensure stability of POK bits. To allow deployments in many scenarios, we demonstrate designs with different latency-area trade-offs. A compact design uses a highly serialized LFSR and LWE decryption function, while a latency-optimized design uses an unrolled  LFSR and a parallel datapath.
+
+%Our results show that the mean (std) of uniformity of the lattice PUF to be $49.98\%$ ($1.58\%$), of uniqueness to be $50.00\%$ ($1.58\%$), and of reliability to be $1.26\%$ ($2.88\%$). In addition to theoretical security guarantee, we evaluate empirical resistance to various leading ML techniques: the prediction error remains above $49.76\%$ after $1$ million training challenge-response pairs (CRPs). We prototyped lattice PUF designs with $2^{136}$ CRPs on a Spartan 6 FPGA. The resource-efficient design requires only $45$ slices for PUF logic proper, and $28$ slices for RFE. The latency-optimized design achieves a $148X$ reduction in latency, at a $10X$ increase in PUF hardware utilization.
+
+%\end{abstract}
+
+%\begin{abstract}
+%Machine learning (ML) modeling attacks are a known threat to strong physical unclonable functions (PUFs). We construct a strong PUF with provable security against ML attacks conducted by both classical and quantum computers. Security is guaranteed by cryptographic hardness of learning decryption functions of public-key cryptosystems. Our construction is based on the hardness of the learning-with-errors (LWE) problem defined on integer lattices. Due to the fundamental connection of LWE to lattice problems, we call our construction the lattice PUF.
+
+%Our results show that the mean (std) of uniformity of the lattice PUF to be $49.98\%$ ($1.58\%$), of uniqueness to be $50.00\%$ ($1.58\%$), and of reliability to be $1.26\%$ ($2.88\%$). Evaluation of empirical resistance to various leading ML techniques shows that the prediction error remains above $49.76\%$ after $1$ million training challenge-response pairs (CRPs). To allow deployments in many scenarios, we demonstrate designs with different latency-area trade-offs, adopting a lightweight reverse fuzzy extractor (RFE). We prototyped the designs with $2^{136}$ CRPs on a Spartan 6 FPGA. The resource-efficient design requires only $45$ slices for PUF logic proper, and $28$ slices for RFE. The latency-optimized design achieves a $148X$ reduction in latency, at a $10X$ increase in PUF hardware utilization.
+
+%\end{abstract}
+
+\begin{abstract}
+We construct a strong PUF with provable security against ML attacks on both classical and quantum computers. The security is guaranteed by the cryptographic hardness of learning decryption functions of public-key cryptosystems, and the hardness of the learning-with-errors (LWE) problem defined on integer lattices. We call our construction the lattice PUF.
+
+
+We construct lattice PUF with a physically obfuscated key and an LWE decryption function block. To allow deployments in different scenarios, we demonstrate designs with different latency-area trade-offs. A compact design uses a highly serialized LFSR and LWE decryption function, while a latency-optimized design uses an unrolled LFSR and a parallel datapath.
+
+
+We prototype lattice PUF designs with $2^{136}$ challenge-response pairs (CRPs) on a Spartan 6 FPGA. In addition to theoretical security guarantee, we evaluate empirical resistance to the various leading ML techniques: the prediction error remains above $49.76\%$ after $1$ million training CRPs. The resource-efficient design requires only $45$ slices for PUF logic proper, and $27$ slices for RFE. The latency-optimized design achieves a $148X$ reduction in latency, at a $10X$ increase in PUF hardware utilization. The mean uniformity of PUF responses is $49.97\%$, the mean uniqueness is $50.00\%$, and the mean reliability is $1.26\%$.
+
+\end{abstract}
+
+% Note that keywords are not normally used for peerreview papers.
+\begin{IEEEkeywords}
+Strong PUF, PAC Learning, Lattice Cryptography, ML Resistance, Design Space Exploration.
+\end{IEEEkeywords}}
+
+%\IEEEauthorblockA{\textit{Department of Electrical and Computer Engineering} \\
+%\textit{The University of Texas at Austin}\\
+% Austin, TX, USA \\
+%\{paul.xiaodan, lige, lhywang, orshansky\}@utexas.edu}
+
+
+%\thanks {© 2021 IEEE.  Personal use of this material is permitted.  Permission from IEEE must be obtained for all other uses, in any current or future media, including reprinting/republishing this material for advertising or promotional purposes, creating new collective works, for resale or redistribution to servers or lists, or reuse of any copyrighted component of this work in other works.}
+
+
+%\title{A Strong Physical Unclonable Function Provably Secure against Machine Learning Attacks}
+
+\maketitle
+
+
+%\begingroup\renewcommand\thefootnote{}
+%\footnotetext{The authors are with the Department of Electrical and Computer Engineering, The University of Texas at Austin, Austin, TX, 78712, USA (e-mail: paul.xiaodan@utexas.edu; lige@utexas.edu; lhywang@utexas.edu; orshansky@utexas.edu).}
+%\renewcommand\thefootnote{*}
+%\footnotetext{Xiaodan Xi and Ge Li are co-first authors.}
+
+
+% use optional argument because the \LaTeX command breaks the PDF keywords
+\input{diff_intro.tex}
+\input{lwe.tex}
+\input{diff_design.tex}
+\input{result.tex}
+\input{conclusion.tex}
+\input{acknowledgement.tex}
+
+\bibliographystyle{abbrv}
+\bibliography{refs/refs.bib}
+
+\begin{IEEEbiography}[{\includegraphics[width=1in,height=1.25in,clip,keepaspectratio]{./profiles/profile_xiaodan.jpg}}]%
+{Xiaodan Xi}
+received his M.S. and Ph.D. degree in Electrical and Computer Engineering from the University of Texas at Austin, Austin, TX, USA in 2016 and 2019. He received his B.S. degree in Electrical Engineering from Zhejiang University, Hangzhou, China in 2014. He is currently a software engineer at DoorDash, Austin, TX, USA. His research interests include security primitives such as physical unclonable function, side-channel analysis, and machine learning based attacks to security systems.
+\end{IEEEbiography}
+
+\begin{IEEEbiography}[{\includegraphics[width=1in,height=1.25in,clip,keepaspectratio]{./profiles/Ge Li.jpg}}]%
+{Ge Li}
+received his M.S. and Ph.D. degree in Electrical and Computer Engineering from the University of Texas at Austin, Austin, TX, USA in 2021 and 2022. He received his B.S. degree in Electronics Engineering and Computer Science from Peking University, Beijing, China, in 2017. His research interests include side channel analysis, side channel resilient VLSI design, machine learning based malware detection, physical unclonable functions and trustworthy AI.
+\end{IEEEbiography}
+
+\begin{IEEEbiography}[{\includegraphics[width=1in,height=1.25in,clip,keepaspectratio]{./profiles/profile_yw.jpg}}]%
+{Ye Wang}
+received his M.S. and Ph.D. degree in Electrical and Computer Engineering from the University of Texas at Austin, Austin, TX, USA in 2015 and 2018, respectively. 
+He received his B.S. degree in Electrical Engineering from Zhejiang University, China in 2012.
+He is currently a software engineer at Youtube, Google. 
+His research interests include recommendation system, hardware security, and numerical linear algebra.
+\end{IEEEbiography}
+
+\begin{IEEEbiography}[{\includegraphics[width=1in,height=1.25in,clip,keepaspectratio]{./profiles/Orshansky.JPG}}]%
+{Michael Orshansky} is a Professor of Electrical and Computer Engineering at the University of Texas at Austin and holds the John E. Kasch Endowed Faculty Fellowship in Engineering. He has published over a hundred technical articles and holds several U.S. patents. He is the author of the book “Design for Manufacturability and Statistical Design.” He has served as an Associate Editor for the IEEE Transactions on Computer-Aided Design of Integrated Circuits and Systems and IEEE Transactions on VLSI. His research interests are in hardware security, design for manufacturability, approximate computing, and HW accelerators of machine learning applications. He is the recipient of a number of awards for his research contributions and professional services. He is a Fellow of IEEE.
+\end{IEEEbiography}
+
+
+\end{document}
