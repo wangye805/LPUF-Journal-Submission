@@ -176,7 +176,7 @@ We adopt the homogeneous error assumption regarding the RFE design. This means a
 The BER of different POKs varies from $0.1\%$ \cite{karpinskyy20168} to $15\%$ \cite{maes2009soft}.
 We configure BER = $1\%$, BER = $5\%$, BER = $10\%$ and BER = $15\%$ to investigate design trade-offs in RFE and POK, and finally configure the BER of SRAM POK in our design to be $5\%$. The RFE targets a $10^{-6}$ failure rate in reconstruction of $1280$ key bits. 
 As described in Section \ref{sec:design}, the overall lattice PUF response BER can achieve the desired value with such a low key reconstruction failure rate.
-Our error-correcting code (ECC) concatenates an inner code and an outer code. The inner code adopts repetition code and the outer code adopts shortened BCH code. Concatenated ECCs usually have shorter code length and lower hardware cost, compared to single codes \cite{bosch2008efficient}.
+Our ECC concatenates an inner code and an outer code. The inner code adopts repetition code and the outer code adopts shortened BCH code. Concatenated ECCs usually have shorter code length and lower hardware cost, compared to single codes \cite{bosch2008efficient}.
 As described in Section \ref{sec:design}, the RFE scheme needs only lightweight encoder implementation on the device side. 
 Table \ref{table:ecc} and \ref{table:hardware_fe} show the parameters and hardware utilization of ECCs with different configurations for BER.
 A $5\%$ BER value requires $6.36K$ SRAM cells in order to reconstruct the $1280$-bit secret value $\mathbf{s}$ with a failure rate of $10^{-6}$.

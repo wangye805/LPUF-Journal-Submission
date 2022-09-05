@@ -325,12 +325,12 @@ The LFSR-LWEDec datapath parallelization and MAC unit parallelization can be com
 
 However, the MAC unit parallelization cannot achieve arbitrary parallelism since the LFSR cannot be unrolled with an arbitrary factor. The LFSR generator polynomial limits the maximum unrolling factor, Fig. \ref{fig:lfsr_unrol_limit}. If the 256-bit LFSR takes the XOR result of $X_{255}$, $X_{253}$, $X_{250}$ and $X_{7}$ as the feedback bit, the LFSR cannot be unrolled by over 8 times with the demonstrated technique, since the LSB $X_{0}$ is only $7$ bits away from $X_{7}$. This indicates the unrolled LFSR cannot produce more than $8$ consecutive feedback bits utilizing consecutive register bits lower than $X_{7}$. The lowest LFSR bit involved in the feedback bit calculation determines the maximum unrolling times. LFSR-LWEDec data-path parallelization is a generic strategy. Its maximum parallelism is not constrained by any specific LFSR implementation. Therefore, in practice, the optimal strategy is to first seek parallelization via LFSR unrolling, and then parallelize the LFSR-LWEDec data-path to achieve further latency optimization once the unrolling of LFSR reaches the limit. We validate the strategy with a detailed design space exploration in Section \ref{sec:result}.
 
-\begin{figure}[t!]
-\centering
-\includegraphics[width = 1.0\linewidth]{./figs/authen_system}
-\caption{Building blocks of the authentication scheme with the lattice PUF.}
-\label{fig:authen_system}
-\end{figure}
+% \begin{figure}[t!]
+% \centering
+% \includegraphics[width = 1.0\linewidth]{./figs/authen_system}
+% \caption{Building blocks of the authentication scheme with the lattice PUF.}
+% \label{fig:authen_system}
+% \end{figure}
 
 \begin{figure}[t!]
 \centering
@@ -343,16 +343,15 @@ However, the MAC unit parallelization cannot achieve arbitrary parallelism since
 
 To reconstruct the same secret key from POK bits each time, we adopt the fuzzy extractor (FE) \cite{bosch2008efficient} method to achieve a low failure rate. 
 %To reduce device-side complexity of design, we use a reverse fuzzy extractor (RFE) that moves the complex error correction process from the device to the server \cite{van2012reverse}. 
-As an example application, we study using the lattice PUF in a string-matching authentication scheme \cite{suh2007physical}.
+As an example application, we study using the lattice PUF in a string-matching authentication scheme \cite{suh2007physical}. Figure \ref{fig:protocol} shows the operations of an end-to-end authentication method using the lattice PUF. 
 
-Figure \ref{fig:authen_system} shows the building blocks of an authentication scheme based on the lattice PUF. 
-The device contains a POK generator, an FE block (\texttt{FE.Gen} and \texttt{FE.Rec}), and a lattice PUF. 
-The server has a database (\texttt{DB}) to store the secret key from the lattice PUF and the valid CRPs generated from enrollment phase.
-Our threat model assumes that the device operates in the field and is the target of ML attacks. 
-%We consider the server to be in a physically secure location, with the \texttt{DB} storing the POK bits and the sever-side lattice PUF being secret. 
+% Figure \ref{fig:authen_system} shows the building blocks of an authentication scheme based on the lattice PUF. 
+% The device contains a POK generator, an FE block (\texttt{FE.Gen} and \texttt{FE.Rec}), and a lattice PUF. 
+% The server has a database (\texttt{DB}) to store the secret key from the lattice PUF and the valid CRPs generated from enrollment phase.
+% Our threat model assumes that the device operates in the field and is the target of ML attacks. 
+% %We consider the server to be in a physically secure location, with the \texttt{DB} storing the POK bits and the sever-side lattice PUF being secret. 
 
-Figure \ref{fig:protocol} shows the operations of an end-to-end authentication method using the lattice PUF. 
-During the enrollment phase, the server reads out the power up values of SRAM cells through a one-time interface, runs the \texttt{FE.Gen} to obtain the helper data (for subsequent reconstructions), and stores the secret key $\mathbf{s}$ in the server \texttt{DB}.
+During the enrollment phase, the server reads out the power up values of SRAM cells through a one-time interface, runs the \texttt{FE.Gen} to obtain the helper data (for subsequent reconstructions), and stores the secret key $\mathbf{s}$ and helper data $\mathbf{h}$ in the server \texttt{DB}.
 Note that there is a critical difference between PUF and the public key cryptosystem use cases:
 for applications using public key cryptosystem, there is only an insecure public channel assumed,
 while for applications using PUFs, secret information can be transferred in a secure manner.
@@ -361,8 +360,8 @@ With $\mathbf{s}$ securely transferred to the server side in PUF enrollment phas
 Moreover, keeping $\mathbf{s}$ on the server side also enables the design optimizations such as dimension relaxation and challenge compression. 
 Upon receiving the secret $\mathbf{s}$, server can apply the perform CRP generation and storing operations: sampling $\text{seed}_{\mathbf{a}^\prime}, \mathbf{e}, \mathbf{r}, \mathbf{x}$ and calculating $\mathbf{b}$'s, as shown in Figure \ref{fig:protocol}.
 
-During each authentication, the error correction uses the code-offset construction with a concatenated code. 
-If the HD between $\mathbf{s}$ and $\mathbf{s}_R$ is within the error-decoding capability of the ECC decoder, the device reconstructs the correct secret key $\mathbf{s}$. 
+During each authentication, the error correction uses the decoder of a concatenated code. 
+If the HD between $\mathbf{s}$ and $\mathbf{s}_R$ is within the error-decoding capability of the error correction code (ECC) decoder, the device reconstructs the correct secret key $\mathbf{s}$ with the helper data. 
 Finally, the server sends the valid challenge $ch=(\text{seed}_{\mathbf{a}^\prime}, \mathbf{b}')$ to the device. 
 The device generates the PUF response $\mathbf{r}_R$ and sends it to the server. 
 The server compares $\mathbf{r}_R$ with the response $\mathbf{r}$ generated from the server-side lattice PUF. 
