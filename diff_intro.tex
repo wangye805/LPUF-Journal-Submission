@@ -55,65 +55,46 @@ Due to the intrinsic connection between the proposed PUF and the lattice cryptog
 %DIF < A lattice PUF is realized by two major components: a POK and an LWE decryption function.
 \DIFdelend A lattice PUF is realized by two major components: a POK and an LWE decryption function. 
 The POK is needed for silicon-intrinsic key generation, with all the well-known security benefits of PUF-based key generation. 
-\DIFdelbegin \DIFdel{(}\DIFdelend An NVM-based key storage mechanism in place of the POK is an alternative approach\DIFdelbegin \DIFdel{but }\DIFdelend \DIFaddbegin \DIFadd{, but is not able to fulfill the storng PUF definition }\DIFaddend with reduced security against physical key-extraction attacks.
+\DIFdelbegin \DIFdel{(}\DIFdelend An NVM-based key storage mechanism in place of the POK is an alternative approach\DIFdelbegin \DIFdel{but }\DIFdelend \DIFaddbegin \DIFadd{, but is not able to fulfill the strong PUF definition }\DIFaddend with reduced security against physical key-extraction attacks.
 \DIFdelbegin \DIFdel{)
 }%DIFDELCMD < 
 
 %DIFDELCMD < %%%
-\DIFdelend The core module of the lattice PUF is the LWE decryption function\DIFdelbegin \DIFdel{. It generates a response (plaintext) for each submitted challenge (ciphertext). By itself, this block represents a keyed LWE-based hash function with restricted inputs (which follow the ciphertext distribution). 
-The restriction on inputs permits a more compact design compared to other known LWE-based pseudorandom functions, e.g. \mbox{%DIFAUXCMD
-\cite{brenner2014fpga}}\hspace{0pt}%DIFAUXCMD
-. 
+\DIFdelend The core module of the lattice PUF is the LWE decryption function.
+It generates a response (plaintext) for each submitted challenge (ciphertext). 
+By itself, this block represents a keyed LWE-based hash function with restricted inputs (which follow the ciphertext distribution). 
+The restriction on inputs permits a more compact design compared to other known LWE-based pseudorandom functions, e.g. \cite{brenner2014fpga}.
 %DIF < which can even guarantee ML resistance without input restrictions. In fact, its hardware implementation requires more logic slices. 
 %DIF < The choice of design parameters for the LWE decryption function considers the trade-offs between the implementation costs, statistical performance, and the concrete hardness of ML resistance.
-The design }\DIFdelend \DIFaddbegin \DIFadd{, which guarantees the ML resistance under a dedicated input distribution. 
-The design }\DIFaddend is carefully crafted considering trade-offs between various aspects.
+The design is carefully crafted considering trade-offs between various aspects.
 We use the total number of operations needed to learn a model of the PUF, as a measure of ML security \cite{lindner2011better, micciancio2009lattice, albrecht2015concrete}. 
 %DIF < Such concrete hardness is established by the analysis of state-of-the-art attacks on the LWE cryptosystem  \cite{lindner2011better, micciancio2009lattice} and evaluated by the estimator developed by Albrecht et al. \cite{albrecht2015concrete}.
 Using this estimator \cite{albrecht2015concrete}, we say that a PUF has $k$-bit ML resistance if a successful ML attack requires $2^k$ operations. 
 Our implementation of the LWE decryption function is configured to achieve a $128$-bit ML resistance.
 
-\DIFdelbegin \DIFdel{Our reliance on LWE to formally guarantee resistance to ML attacks is novel. 
-We highlight a critical difference between our work and recent work  \mbox{%DIFAUXCMD
-\cite{herder2017trapdoor,jin2017fpga}}\hspace{0pt}%DIFAUXCMD
-.
+Our reliance on LWE to formally guarantee resistance to ML attacks is novel.
+We highlight a critical difference between our work and recent work \cite{herder2017trapdoor,jin2017fpga}.
 %DIF < \cite{fuller2013computational,herder2017trapdoor,jin2017fpga} have also utilized lattice-based problems, including learning-parity-with-noise (LPN) and LWE, to realize computationally-secure fuzzy extractors (FEs) and, as a byproduct, to construct strong PUFs.\footnote{A computational FE guarantees absence of information leakage from publicly shared helper data via computational hardness in contrast to conventional FEs that need to limit their information-theoretic entropy leakage.} 
 %DIF < Here, CRP generation is based on generating multiple private keys (playing the role of PUF responses) and multiple public keys (playing the role of PUF challenges). 
-In short, the input-output mapping between the PUF of \mbox{%DIFAUXCMD
-\cite{herder2017trapdoor,jin2017fpga} }\hspace{0pt}%DIFAUXCMD
-and the underlying LPN or LWE cryptosystem can be briefly summarized as follows: 
+In short, the input-output mapping between the PUF of \cite{herder2017trapdoor,jin2017fpga} and the underlying LPN or LWE cryptosystem can be briefly summarized as follows: 
  challenges $\Longleftrightarrow$ public keys and responses $\Longleftrightarrow$  private keys. In contrast, the mapping of our construction is: challenges $\Longleftrightarrow$ ciphertexts and responses $\Longleftrightarrow$ decrypted plaintexts.
-}%DIFDELCMD < 
 
-%DIFDELCMD < %%%
-\DIFdel{Although both constructions utilize lattice-based cryptosystems, they differ fundamentally in the root of their security guarantees.
-The fundamental security property that \mbox{%DIFAUXCMD
-\cite{fuller2013computational} }\hspace{0pt}%DIFAUXCMD
-rely upon is the }\emph{\DIFdel{computational hardness of recovering a private key from a public key in a public-key cryptosystem}}%DIFAUXCMD
-\DIFdel{. 
-It turns out that, when building strong PUFs using public keys as challenges and private keys as responses, this security is insufficient. The vulnerability is due to the fact that the challenges are by definition publicly known \mbox{%DIFAUXCMD
-\cite{fuller2013computational,herder2017trapdoor,jin2017fpga}}\hspace{0pt}%DIFAUXCMD
-, and an attacker can use multiple challenges (public keys) to recover the private key. This is only possible because multiple public keys are derived using a fixed (same) source of secret POK bits, embedded in the error term of LPN or LWE. As was shown in \mbox{%DIFAUXCMD
-\cite{apon2017efficient}}\hspace{0pt}%DIFAUXCMD
-, the fact that multiple CRPs have shared error terms can be easily exploited, which allows a computationally-inexpensive algorithm for solving an LPN or LWE instance. %DIF < thus compromising the hardness of LPN or LWE problems. Thus, by itself \cite{fuller2013computational,herder2017trapdoor,jin2017fpga}, \emph{the resulting PUF does not have resistance against ML modeling attacks}. This vulnerability is fixed in \cite{herder2017trapdoor,jin2017fpga} by introducing a cryptographic hash function to hide the original CRPs. 
-}%DIFDELCMD < 
+Although both constructions utilize lattice-based cryptosystems, they differ fundamentally in the root of their security guarantees.
+The fundamental security property that \cite{fuller2013computational} rely upon is the \emph{computational hardness of recovering a private key from a public key in a public-key cryptosystem}. 
+It turns out that, when building strong PUFs using public keys as challenges and private keys as responses, this security is insufficient. 
+The vulnerability is due to the fact that the challenges are by definition publicly known \cite{fuller2013computational,herder2017trapdoor,jin2017fpga}, and an attacker can use multiple challenges (public keys) to recover the private key. 
+This is only possible because multiple public keys are derived using a fixed (same) source of secret POK bits, embedded in the error term of LPN or LWE. 
+As was shown in \cite{apon2017efficient}, the fact that multiple CRPs have shared error terms can be easily exploited, which allows a computationally-inexpensive algorithm for solving an LPN or LWE instance. 
+%DIF < thus compromising the hardness of LPN or LWE problems. Thus, by itself \cite{fuller2013computational,herder2017trapdoor,jin2017fpga}, \emph{the resulting PUF does not have resistance against ML modeling attacks}. This vulnerability is fixed in \cite{herder2017trapdoor,jin2017fpga} by introducing a cryptographic hash function to hide the original CRPs. 
 
-%DIFDELCMD < %%%
-\emph{\DIFdel{In stark contrast, the proposed lattice PUF derives its security by directly exploiting a distinctly different property of public-key cryptosystems: the theoretically-proven guarantee that their decryption functions are not PAC learnable}}%DIFAUXCMD
-\DIFdel{. 
+\emph{In stark contrast, the proposed lattice PUF derives its security by directly exploiting a distinctly different property of public-key cryptosystems: the theoretically-proven guarantee that their decryption functions are not PAC learnable}. 
 (As is shown later, this property stems from the semantic security of a cryptosystem coupled with the ease of generating multiple ciphertexts.) 
 Lattice PUF does not have the vulnerability mentioned above since the publicly known challenges are ciphertexts and the security of the public-key cryptosystem guarantees that the fixed private key (the POK, in our case) cannot be recovered from ciphertexts.
-}%DIFDELCMD < 
 
-%DIFDELCMD < %%%
-\DIFdel{Further, the construction of  \mbox{%DIFAUXCMD
-\cite{herder2017trapdoor,jin2017fpga} }\hspace{0pt}%DIFAUXCMD
-is expensive since (1) recovering secrets from helper data requires solving a system of linear equations, and (2) implementing a hash function is costly.  
+Further, the construction of  \cite{herder2017trapdoor,jin2017fpga} is expensive since (1) recovering secrets from helper data requires solving a system of linear equations, and (2) implementing a hash function is costly.  
 In contrast, our PUF is lightweight since it implements only the LWE decryption function rather than the expensive encryption function.
-}%DIFDELCMD < 
 
-%DIFDELCMD < %%%
-\DIFdelend Since a PUF may be deployed in very different applications, it is critical to convert a theoretically sound construction into an efficient physical implementation. 
+Since a PUF may be deployed in very different applications, it is critical to convert a theoretically sound construction into an efficient physical implementation. 
 To allow practical deployments of our construction under different requirements, we investigate a series of lattice PUF designs targeting different scenarios. 
 We first investigate a resource-efficient design, which is suitable for extremely resource-constrained environments, such as embedded/edge devices. 
 Directly constructing a strong PUF from an LWE decryption function is not efficient since it requires $1288$ input challenge bits to produce $1$ response bit.
@@ -137,65 +118,17 @@ The second strategy demonstrates better hardware efficiency, but its maximum par
 The LFSR generator polynomial limits the maximum unrolling factor. 
 We show that the optimal strategy is to initially use parallelization of the LWE decryption function, and then parallelize the LSFR and the LWE decryption datapath to achieve further latency improvement.
 
-\DIFaddbegin \DIFadd{Though all inspired by the LWE problem, we highlight key differences of our lattice PUF against the strong PUF based on LWE/LPN CFE \mbox{%DIFAUXCMD
-\cite{herder2017trapdoor,jin2017fpga}}\hspace{0pt}%DIFAUXCMD
-, a LWE-based pseudorandom function \mbox{%DIFAUXCMD
-\cite{brenner2014fpga}}\hspace{0pt}%DIFAUXCMD
-, and the direct implementation of a LWE public-key cryptosystem.
+Our lattice PUF construction \DIFaddbegin \DIFadd{is different from direct authentication using an LWE public-key cryptosystem with a key generated from a POK in the following aspects. 
+Though the ML resistance of lattice PUF is derived from LWE public-key cryptosystem, we do not assume an interface transferring only a public key. 
+Instead, the enrollment phase in the PUF scenarios permits secret information transferred in a secure manner. 
+Transferring a secret key in the enrollment phase enables efficient implementation. 
+First, the computationally expensive discrete Gaussian sampling can happen on the server side. 
+Second, it allows for the dimension relaxation and challenge compression in our construction as we demonstrate in Section \ref{sec:design}.
+Third, the enrollment phase allows the server to store valid CRPs, then only valid CRPs can be sent to PUFs. 
+Compared to the LWE public-key encryption scheme which generates ciphertexts dynamically on the fly, CRP pre-storage further permits lower latency in authentication.
 }
 
-\DIFadd{First, compared to the strong PUF based on LWE/LPN CFE \mbox{%DIFAUXCMD
-\cite{herder2017trapdoor,jin2017fpga}}\hspace{0pt}%DIFAUXCMD
-, our reliance on LWE to formally guarantee resistance to ML attacks is novel.
-In short, the input-output mapping between the PUF of \mbox{%DIFAUXCMD
-\cite{herder2017trapdoor,jin2017fpga} }\hspace{0pt}%DIFAUXCMD
-and the underlying LPN or LWE cryptosystem can be briefly summarized as follows: 
- challenges $\Longleftrightarrow$ public keys and responses $\Longleftrightarrow$  private keys. In contrast, the mapping of our construction is: challenges $\Longleftrightarrow$ ciphertexts and responses $\Longleftrightarrow$ decrypted plaintexts.
-}
-
-\DIFadd{Although both constructions utilize lattice-based cryptosystems, they differ fundamentally in the root of their security guarantees.
-The fundamental security property that \mbox{%DIFAUXCMD
-\cite{fuller2013computational} }\hspace{0pt}%DIFAUXCMD
-rely upon is the }\emph{\DIFadd{computational hardness of recovering a private key from a public key in a public-key cryptosystem}}\DIFadd{. 
-It turns out that, when building strong PUFs using public keys as challenges and private keys as responses, this security is insufficient. 
-The vulnerability is due to the fact that the challenges are by definition publicly known \mbox{%DIFAUXCMD
-\cite{fuller2013computational,herder2017trapdoor,jin2017fpga}}\hspace{0pt}%DIFAUXCMD
-, and an attacker can use multiple challenges (public keys) to recover the private key. 
-This is only possible because multiple public keys are derived using a fixed (same) source of secret POK bits, embedded in the error term of LPN or LWE. 
-As was shown in \mbox{%DIFAUXCMD
-\cite{apon2017efficient}}\hspace{0pt}%DIFAUXCMD
-, the fact that multiple CRPs have shared error terms can be easily exploited, which allows a computationally-inexpensive algorithm for solving an LPN or LWE instance. 
-}
-
-\emph{\DIFadd{In stark contrast, the proposed lattice PUF derives its security by directly exploiting a distinctly different property of public-key cryptosystems: the theoretically-proven guarantee that their decryption functions are not PAC learnable}}\DIFadd{. 
-(As is shown later, this property stems from the semantic security of a cryptosystem coupled with the ease of generating multiple ciphertexts.) 
-Lattice PUF does not have the vulnerability mentioned above since the publicly known challenges are ciphertexts and the security of the public-key cryptosystem guarantees that the fixed private key (the POK, in our case) cannot be recovered from ciphertexts.
-}
-
-\DIFadd{Further, the construction of  \mbox{%DIFAUXCMD
-\cite{herder2017trapdoor,jin2017fpga} }\hspace{0pt}%DIFAUXCMD
-is expensive since (1) recovering secrets from helper data requires solving a system of linear equations, and (2) implementing a hash function is costly.  
-In contrast, our PUF is lightweight since it implements only the LWE decryption function rather than the expensive encryption function.
-}
-
-\DIFadd{Second, our lattice PUF construction can be seen as a keyed LWE-based hash function with restricted inputs (which follow the ciphertext distribution). 
-It generates a response (plaintext) for each submitted challenge (ciphertext). 
-This construction together with the input distribution already satisfies the requirements of ML resistance, as we show in Section \ref{sec:lwe}.
-In particular, this restriction on inputs permits a more compact design compared to other known LWE-based pseudorandom functions, e.g. \mbox{%DIFAUXCMD
-\cite{brenner2014fpga}}\hspace{0pt}%DIFAUXCMD
-, which guarantees more than just ML resistance. 
-}
-
-\DIFadd{Third, our lattice PUF construction is different from a direct implementation of LWE public-key cryptosystem with key generated from POKs in the following aspects. 
-In contrast to the insecure public channel assumed in public-key cryptosystem use cases, the enrollment phase in the PUF scenarios permits secret information transferred in a secure manner. 
-Transferring both secret key and public key in the enrollment phase enables efficient implementation. 
-On one hand, the computationally expensive discrete Gaussian sampling can happen on the server side. 
-On the other hand, it also allows for the dimension relaxation and challenge compression in our construction as we show in Section \ref{sec:design}.
-Moreover, this enrollment phase allows the server to store the valid CRPs and then only valid CRPs can be sent to PUFs on the device side. 
-This is different from the LWE public-key encryption scheme which generates ciphertexts dynamically on the fly.
-}
-
-\DIFaddend Our lattice PUF construction achieves a CRP space size of $2^{136}$.
+\DIFadd{Our lattice PUF construction }\DIFaddend achieves a CRP space size of $2^{136}$.
 Statistical simulation shows the proposed lattice PUF has excellent uniformity, uniqueness, and reliability.
 The mean (standard deviation) of uniformity is $49.98\%$ ($1.58\%$), and of inter-class Hamming distance (HD) is $50.00\%$ ($1.58\%$).
 The mean BER (intra-class HD) is $1.26\%$.

@@ -339,11 +339,10 @@ However, the MAC unit parallelization cannot achieve arbitrary parallelism since
 \label{fig:protocol}
 \end{figure}
 
-\subsection{Application Scenario}
-
+\subsection{PUF-Based Authentication}
+As an example application, we study using the lattice PUF in a string-matching authentication scheme \cite{suh2007physical}. 
 To reconstruct the same secret key from POK bits each time, we adopt the fuzzy extractor (FE) \cite{bosch2008efficient} method to achieve a low failure rate. 
-%To reduce device-side complexity of design, we use a reverse fuzzy extractor (RFE) that moves the complex error correction process from the device to the server \cite{van2012reverse}. 
-As an example application, we study using the lattice PUF in a string-matching authentication scheme \cite{suh2007physical}. Figure \ref{fig:protocol} shows the operations of an end-to-end authentication method using the lattice PUF. 
+Figure \ref{fig:protocol} shows the operations of an end-to-end authentication method using the lattice PUF. 
 
 % Figure \ref{fig:authen_system} shows the building blocks of an authentication scheme based on the lattice PUF. 
 % The device contains a POK generator, an FE block (\texttt{FE.Gen} and \texttt{FE.Rec}), and a lattice PUF. 
@@ -351,18 +350,18 @@ As an example application, we study using the lattice PUF in a string-matching a
 % Our threat model assumes that the device operates in the field and is the target of ML attacks. 
 % %We consider the server to be in a physically secure location, with the \texttt{DB} storing the POK bits and the sever-side lattice PUF being secret. 
 
-During the enrollment phase, the server reads out the power up values of SRAM cells through a one-time interface, runs the \texttt{FE.Gen} to obtain the helper data (for subsequent reconstructions), and stores the secret key $\mathbf{s}$ and helper data $\mathbf{h}$ in the server \texttt{DB}.
-Note that there is a critical difference between PUF and the public key cryptosystem use cases:
+During the enrollment phase, the server reads out the power-up values of SRAM cells through a one-time interface, runs the helper data generation block in FE \texttt{FE.Gen} (for subsequent reconstructions), and stores both secret key $\mathbf{s}$ and helper data $\mathbf{h}$ in the server \texttt{DB}.
+Note that there is a critical difference between the PUF and the public key cryptosystem use-cases:
 for applications using public key cryptosystem, there is only an insecure public channel assumed,
 while for applications using PUFs, secret information can be transferred in a secure manner.
 Since only a public key can be transferred, for a direct implementation of the LWE cryptosystem, the device side has to perform the public key generation including the relatively expensive discrete Gaussian sampling. 
-With $\mathbf{s}$ securely transferred to the server side in PUF enrollment phase, the computational expensive operations such as discrete Gaussian sampling ($\mathbf{e}$) can happen on the server side rather than the PUF side.
-Moreover, keeping $\mathbf{s}$ on the server side also enables the design optimizations such as dimension relaxation and challenge compression. 
-Upon receiving the secret $\mathbf{s}$, server can apply the perform CRP generation and storing operations: sampling $\text{seed}_{\mathbf{a}^\prime}, \mathbf{e}, \mathbf{r}, \mathbf{x}$ and calculating $\mathbf{b}$'s, as shown in Figure \ref{fig:protocol}.
+With $\mathbf{s}$ securely transferred to the server side in PUF enrollment phase, the computationally expensive discrete Gaussian sampling ($\mathbf{e}$) can happen on the server side rather than the PUF side.
+Moreover, keeping $\mathbf{s}$ on the server side also enables challenge compression via dimension relaxation. 
+Upon receiving the secret $\mathbf{s}$, the server performs CRP generation and stores them, as shown in Figure \ref{fig:protocol}.
 
 During each authentication, the error correction uses the decoder of a concatenated code. 
 If the HD between $\mathbf{s}$ and $\mathbf{s}_R$ is within the error-decoding capability of the error correction code (ECC) decoder, the device reconstructs the correct secret key $\mathbf{s}$ with the helper data. 
 Finally, the server sends the valid challenge $ch=(\text{seed}_{\mathbf{a}^\prime}, \mathbf{b}')$ to the device. 
-The device generates the PUF response $\mathbf{r}_R$ and sends it to the server. 
-The server compares $\mathbf{r}_R$ with the response $\mathbf{r}$ generated from the server-side lattice PUF. 
-The device will be accepted if $\text{HD}(\mathbf{r}_R, \mathbf{r})$ is less than a threshold $th$.
+The device generates the PUF response $\mathbf{r}_R$ by running the PUF function $\mathbf{r}_R = \text{PUF}(ch, \mathbf{s})$ and sends it to the server. 
+The server compares $\mathbf{r}_R$ with the response $\mathbf{r}$ stored in DB:
+the device is accepted if $\text{HD}(\mathbf{r}_R, \mathbf{r})$ is less than a given threshold $th$.

@@ -345,18 +345,27 @@ However, the MAC unit parallelization cannot achieve arbitrary parallelism since
 
 \begin{figure}[t!]
 \centering
-\includegraphics[width = 0.9\linewidth]{./figs/protocol}
-\caption{End-to-end authentication method with the lattice PUF.}
+\DIFdelbeginFL %DIFDELCMD < \includegraphics[width = 0.9\linewidth]{./figs/protocol}
+%DIFDELCMD < %%%
+\DIFdelendFL \DIFaddbeginFL \includegraphics[width = 1.0\linewidth]{./figs/protocol}
+\DIFaddendFL \caption{End-to-end authentication method with the lattice PUF.}
 \label{fig:protocol}
 \end{figure}
 
-\subsection{Application Scenario\DIFdelbegin \DIFdel{and Reverse Fuzzy Extractor}\DIFdelend }
+\subsection{\DIFdelbegin \DIFdel{Application Scenario and Reverse Fuzzy Extractor}\DIFdelend \DIFaddbegin \DIFadd{PUF-Based Authentication}\DIFaddend }
+\DIFdelbegin %DIFDELCMD < 
 
-To reconstruct \DIFdelbegin \DIFdel{stable POK bits }\DIFdelend \DIFaddbegin \DIFadd{the same secret key from POK bits each time}\DIFaddend , we adopt the fuzzy extractor (FE) \cite{bosch2008efficient} method to achieve a low failure rate. 
+%DIFDELCMD < %%%
+\DIFdel{To reconstruct stable POK bits }\DIFdelend \DIFaddbegin \DIFadd{As an example application, we study using the lattice PUF in a string-matching authentication scheme \mbox{%DIFAUXCMD
+\cite{suh2007physical}}\hspace{0pt}%DIFAUXCMD
+. 
+To reconstruct the same secret key from POK bits each time}\DIFaddend , we adopt the fuzzy extractor (FE) \cite{bosch2008efficient} method to achieve a low failure rate. 
 \DIFdelbegin \DIFdel{To reduce device-side complexity of design, we use a reverse fuzzy extractor (RFE) that moves the complex error correction process from the device to the server \mbox{%DIFAUXCMD
 \cite{van2012reverse}}\hspace{0pt}%DIFAUXCMD
-. }\DIFdelend %DIF > To reduce device-side complexity of design, we use a reverse fuzzy extractor (RFE) that moves the complex error correction process from the device to the server \cite{van2012reverse}. 
-As an example application, we study using the lattice PUF in a string-matching authentication scheme \cite{suh2007physical}. \DIFdelbegin %DIFDELCMD < 
+. As an example application, we study using the lattice PUF in a string-matching authentication scheme \mbox{%DIFAUXCMD
+\cite{suh2007physical}}\hspace{0pt}%DIFAUXCMD
+.
+}%DIFDELCMD < 
 
 %DIFDELCMD < %%%
 \DIFdel{Figure \ref{fig:authen_system} shows the building blocks of an authentication scheme based on }\DIFdelend \DIFaddbegin \DIFadd{Figure \ref{fig:protocol} shows the operations of an end-to-end authentication method using }\DIFaddend the lattice PUF. 
@@ -369,7 +378,7 @@ As an example application, we study using the lattice PUF in a string-matching a
 %DIF >  Our threat model assumes that the device operates in the field and is the target of ML attacks. 
 %DIF >  %We consider the server to be in a physically secure location, with the \texttt{DB} storing the POK bits and the sever-side lattice PUF being secret. 
 
-\DIFadd{During the enrollment phase, the server reads out the power up values of SRAM cells through a one-time interface, runs the }\texttt{\DIFadd{FE.Gen}} \DIFadd{to obtain the helper data (for subsequent reconstructions}\DIFaddend ), and \DIFdelbegin \DIFdel{a lattice PUF. The server has a database (}\DIFdelend \DIFaddbegin \DIFadd{stores the secret key $\mathbf{s}$ and helper data $\mathbf{h}$ in the server }\DIFaddend \texttt{DB}\DIFdelbegin \DIFdel{) to store the POK, an RFE reconstruction block (}\texttt{\DIFdel{RFE.Rec}}%DIFAUXCMD
+\DIFadd{During the enrollment phase, the server reads out the power-up values of SRAM cells through a one-time interface, runs the helper data generation block in FE }\texttt{\DIFadd{FE.Gen}} \DIFadd{(for subsequent reconstructions}\DIFaddend ), and \DIFdelbegin \DIFdel{a lattice PUF. The server has a database (}\DIFdelend \DIFaddbegin \DIFadd{stores both secret key $\mathbf{s}$ and helper data $\mathbf{h}$ in the server }\DIFaddend \texttt{DB}\DIFdelbegin \DIFdel{) to store the POK, an RFE reconstruction block (}\texttt{\DIFdel{RFE.Rec}}%DIFAUXCMD
 \DIFdel{),
 and a server-side lattice PUF.
 }%DIFDELCMD < 
@@ -382,27 +391,21 @@ We consider the server to be in a physically secure location, with the }\texttt{
 }%DIFDELCMD < 
 
 %DIFDELCMD < %%%
-\DIFdel{Figure \ref{fig:protocol} shows the operations of an end-to-end authentication method using the lattice PUF. 
-During the enrollment phase, the server reads out the POK }\DIFdelend \DIFaddbegin \DIFadd{.
-Note that there is a critical difference between PUF and the public key cryptosystem use cases:
+\DIFdel{Figure \ref{fig:protocol} shows the operations of an end-to-end authentication method using the lattice PUF. During the enrollment phase, }\DIFdelend \DIFaddbegin \DIFadd{.
+Note that there is a critical difference between the PUF and the public key cryptosystem use-cases:
 for applications using public key cryptosystem, there is only an insecure public channel assumed,
 while for applications using PUFs, secret information can be transferred in a secure manner.
 Since only a public key can be transferred, for a direct implementation of the LWE cryptosystem, the device side has to perform the public key generation including the relatively expensive discrete Gaussian sampling. 
-With }\DIFaddend $\mathbf{s}$ \DIFdelbegin \DIFdel{from the SRAM cells through a one-time interface, and stores it in the server }\texttt{\DIFdel{DB}}%DIFAUXCMD
+With $\mathbf{s}$ securely transferred to the server side in PUF enrollment phase, }\DIFaddend the \DIFdelbegin \DIFdel{server reads out the POK }\DIFdelend \DIFaddbegin \DIFadd{computationally expensive discrete Gaussian sampling ($\mathbf{e}$) can happen on the server side rather than the PUF side.
+Moreover, keeping }\DIFaddend $\mathbf{s}$ \DIFdelbegin \DIFdel{from the SRAM cells through a one-time interface, and stores it in the server }\texttt{\DIFdel{DB}}%DIFAUXCMD
 \DIFdel{.
-}\DIFdelend \DIFaddbegin \DIFadd{securely transferred to the server side in PUF enrollment phase, the computational expensive operations such as discrete Gaussian sampling ($\mathbf{e}$) can happen on the server side rather than the PUF side.
-Moreover, keeping $\mathbf{s}$ on the server side also enables the design optimizations such as dimension relaxation and challenge compression. 
-Upon receiving the secret $\mathbf{s}$, server can apply the perform CRP generation and storing operations: sampling $\text{seed}_{\mathbf{a}^\prime}, \mathbf{e}, \mathbf{r}, \mathbf{x}$ and calculating $\mathbf{b}$'s, as shown in Figure \ref{fig:protocol}.
+}\DIFdelend \DIFaddbegin \DIFadd{on the server side also enables challenge compression via dimension relaxation. 
+Upon receiving the secret $\mathbf{s}$, the server performs CRP generation and stores them, as shown in Figure \ref{fig:protocol}.
 }
 
 \DIFaddend During each authentication, the error correction uses the \DIFdelbegin \DIFdel{code-offset construction with }\DIFdelend \DIFaddbegin \DIFadd{decoder of }\DIFaddend a concatenated code. 
 \DIFdelbegin \DIFdel{Here the secret $\mathbf{t}$ is a nonce, which is encoded into a codeword $\mathbf{k}$ and then XORed with the SRAM bits $\mathbf{s}_R$ to produce the helper data $\mathbf{h}$. The server reverses these steps using the enrolled POK $\mathbf{s}$. }\DIFdelend If the HD between $\mathbf{s}$ and $\mathbf{s}_R$ is within the error-decoding capability of the \DIFdelbegin \DIFdel{ECC }\DIFdelend \DIFaddbegin \DIFadd{error correction code (ECC) }\DIFaddend decoder, the \DIFdelbegin \DIFdel{server }\DIFdelend \DIFaddbegin \DIFadd{device }\DIFaddend reconstructs the correct secret key \DIFdelbegin \DIFdel{$\mathbf{t}$}\DIFdelend \DIFaddbegin \DIFadd{$\mathbf{s}$ with the helper data}\DIFaddend . 
 Finally, the server sends the \DIFaddbegin \DIFadd{valid }\DIFaddend challenge $ch=(\text{seed}_{\mathbf{a}^\prime}, \mathbf{b}')$ to the device. 
-The device generates the PUF response $\mathbf{r}_R$ and sends it to the server. 
-The server compares $\mathbf{r}_R$ with the response $\mathbf{r}$ generated from the server-side lattice PUF. 
-The device will be accepted if $\text{HD}(\mathbf{r}_R, \mathbf{r})$ is less than a threshold $th$.
- \DIFdelbegin %DIFDELCMD < 
-
-%DIFDELCMD < %%%
-%DIF < \textcolor{red}{A class of attacks which manipulates public helper data to exploit PUF generated keys can compromise PUF security \cite{helper_data_manipulation}. Such attacks apply to pairing-based PUFs (for instance, RO PUFs), and require public access to helper data. However, such attacks may not be applicable to our construction, since our POK is based on the SRAM PUF, which follows a completely different mechanism. In addition, the possibility of the attacks can be reduced by limiting public access to helper data. Therefore, the helper data manipulation attack is not a major focus for our design.}
- \DIFdelend
+The device generates the PUF response $\mathbf{r}_R$ \DIFaddbegin \DIFadd{by running the PUF function $\mathbf{r}_R = \text{PUF}(ch, \mathbf{s})$ }\DIFaddend and sends it to the server. 
+The server compares $\mathbf{r}_R$ with the response $\mathbf{r}$ \DIFdelbegin \DIFdel{generated from the server-side lattice PUF. The device will be }\DIFdelend \DIFaddbegin \DIFadd{stored in DB:
+the device is }\DIFaddend accepted if $\text{HD}(\mathbf{r}_R, \mathbf{r})$ is less than a \DIFaddbegin \DIFadd{given }\DIFaddend threshold $th$.
