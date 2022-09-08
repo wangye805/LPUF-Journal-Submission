@@ -1,7 +1,12 @@
 \section{Experimental Results}
 \label{sec:result}
 
-We simulate the behavior of the proposed ML-resistant PUF using Python. The statistics of raw SRAM PUF responses are based on \cite{maes2013accurate, maes2009soft}. The logical behavior of other digital circuits are accurately captured by software. We virtually manufacture (simulate) $1000$ distinct lattice PUF instances with design parameters chosen in Section \ref{sec:design}. The CRPs of the PUF instances are collected to examine: (1) statistical characteristics (uniformity, uniqueness, and reliability), and (2) resistance to leading ML modeling attacks. The whole lattice PUF design (besides the SRAM PUF) is implemented on a Xilinx Spartan-6 FPGA.
+We simulate the behavior of the proposed ML-resistant PUF using Python. 
+The statistics of raw SRAM PUF responses are based on \cite{maes2013accurate, maes2009soft}. 
+The logical behavior of other digital circuits are accurately captured by software. 
+We virtually manufacture (simulate) $1000$ distinct lattice PUF instances with design parameters chosen in Section \ref{sec:design}. 
+The CRPs of the PUF instances are collected to examine: (1) statistical characteristics (uniformity, uniqueness, and reliability), and (2) resistance to leading ML modeling attacks. 
+The whole lattice PUF design (besides the SRAM PUF) is implemented on a Xilinx Spartan-6 FPGA.
 
 
 \subsection{Statistical Analysis}
@@ -36,9 +41,23 @@ We simulate the behavior of the proposed ML-resistant PUF using Python. The stat
 %As discussed in Section \ref{sec:design}, the overall BER of the lattice PUF is due to two components: the failure rate of key reconstruction and LWE decryption error rate.
 %Intra-class HD in Figure \ref{fig:inter_intra} reflects the result of decryption errors by assuming a perfect key reconstruction. 
 
-In this section, we examine statistical metrics of the proposed PUF. Uniformity, uniqueness and reliability are commonly adopted metrics to evaluate the statistical performance of a PUF \cite{maiti2013systematic}. \textbf{Uniformity} measures the mean Hamming Weight of responses from a PUF under a set of random challenges. The ideal uniformity is 0.5, which indicates the zero bits and the one bits are distributed uniformly in PUF response. \textbf{Uniqueness} measures the mean Hamming Distance of PUF responses between a pair of different PUF instances (inter-class HD), with the same set of PUF challenges. The ideal uniqueness is 0.5, which means each PUF instance produces a unique response distribution. \textbf{Reliability} measures the mean Hamming Distance between actual PUF responses and the enrolled (ideal) PUF responses (intra-class HD). The ideal PUF is expected to have no bit flips in responses compared to the enrolled values.
+In this section, we examine statistical metrics of the proposed PUF. 
+Uniformity, uniqueness and reliability are commonly adopted metrics to evaluate the statistical performance of a PUF \cite{maiti2013systematic}. 
+\textbf{Uniformity} measures the mean Hamming Weight of responses from a PUF under a set of random challenges. 
+The ideal uniformity is 0.5, which indicates the zero bits and the one bits are distributed uniformly in PUF response. 
+\textbf{Uniqueness} measures the mean Hamming Distance of PUF responses between a pair of different PUF instances (inter-class HD), with the same set of PUF challenges. 
+The ideal uniqueness is 0.5, which means each PUF instance produces a unique response distribution. \textbf{Reliability} measures the mean Hamming Distance between actual PUF responses and the enrolled (ideal) PUF responses (intra-class HD). 
+The ideal PUF is expected to have no bit flips in responses compared to the enrolled values.
 
-We evaluate the metrics with 1000 lattice PUF instances and 1000 random challenges following LWE ciphertext distribution \cite{maiti2013systematic}. The lattice PUF demonstrates near ideal statistical properties: the mean of uniformity distribution is 0.4998 (std = 0.0158) and the mean of uniqueness distribution is 0.5 (std = 0.0158). To evaluate PUF reliability, we assume the key reconstruction process is ideal and the errors merely come from LWE decryption. Figure \ref{fig:inter_intra} shows the lattice PUF reliability distribution centers close to 0. 
+We evaluate the metrics with 1000 lattice PUF instances and 1000 random challenges following LWE ciphertext distribution. 
+In generation of the LWE ciphertext distribution, the plaintext $r$ is unbiased since it is generated from a uniform binary distribution. 
+However, when applying the corresponding ciphertext $\mathbf{c}$ to a lattice PUF, its actual output $\mathbf{r}_R$ of may not always be the same as $r$ due to the decryption error. 
+Recall in Section \ref{sec:design}, the decryption error rate is targeted at 1.26\%. 
+Therefore, the uniformity and uniqueness tests are performed based on the actual outputs $\mathbf{r}_R$'s.
+
+The lattice PUF demonstrates near ideal statistical properties: the mean of uniformity distribution is 0.4998 (std = 0.0158) and the mean of uniqueness distribution is 0.5 (std = 0.0158). 
+To evaluate PUF reliability, we assume the key reconstruction process is ideal and the errors merely come from LWE decryption. 
+Figure \ref{fig:inter_intra} shows the lattice PUF reliability distribution centers close to 0. 
 
 
 
@@ -172,19 +191,20 @@ The results also validate the challenge compression technique demonstrated in Se
 
 In this section, we show the hardware implementation details of lattice PUF. We synthesize, configure and test the entire design on a low-end XC6SLX45 FPGA device of Xilinx Spartan-6 family.  
 
-We adopt the homogeneous error assumption regarding the RFE design. This means all cells are assumed to have the same BER \cite{bosch2008efficient}.
+We adopt the homogeneous error assumption regarding the FE design. This means all cells are assumed to have the same BER \cite{bosch2008efficient}.
 The BER of different POKs varies from $0.1\%$ \cite{karpinskyy20168} to $15\%$ \cite{maes2009soft}.
-We configure BER = $1\%$, BER = $5\%$, BER = $10\%$ and BER = $15\%$ to investigate design trade-offs in RFE and POK, and finally configure the BER of SRAM POK in our design to be $5\%$. The RFE targets a $10^{-6}$ failure rate in reconstruction of $1280$ key bits. 
+We configure BER = $1\%$, BER = $5\%$, BER = $10\%$ and BER = $15\%$ to investigate design trade-offs in FE and POK, and finally configure the BER of SRAM POK in our design to be $5\%$. The FE targets a $10^{-6}$ failure rate in reconstruction of $1280$ key bits. 
 As described in Section \ref{sec:design}, the overall lattice PUF response BER can achieve the desired value with such a low key reconstruction failure rate.
 Our ECC concatenates an inner code and an outer code. The inner code adopts repetition code and the outer code adopts shortened BCH code. Concatenated ECCs usually have shorter code length and lower hardware cost, compared to single codes \cite{bosch2008efficient}.
-As described in Section \ref{sec:design}, the RFE scheme needs only lightweight encoder implementation on the device side. 
+%As described in Section \ref{sec:design}, the RFE scheme needs only lightweight encoder implementation on the device side. 
 Table \ref{table:ecc} and \ref{table:hardware_fe} show the parameters and hardware utilization of ECCs with different configurations for BER.
 A $5\%$ BER value requires $6.36K$ SRAM cells in order to reconstruct the $1280$-bit secret value $\mathbf{s}$ with a failure rate of $10^{-6}$.
-The RFE encoder design requires $26$ slices. 
-We adopt the SRAM-based design of \cite{aysu2015end} to implement the TRNG. The advantage is that the SRAM cells used to generate $\mathbf{s}$ can be reused for the SRAM-TRNG design. 
-We adopt the 8-fold XORing of SRAM bits in \cite{aysu2015end} and therefore need $10.06K$ (i.e. $3.7K$ additional) SRAM cells. 
-The 8-fold XORing logic design requires $1$ slice. 
-Then, for the $5\%$ raw BER, the RFE design requires $27$ slices in total. 
+%The RFE encoder design requires $26$ slices. 
+The FE design requires $351$ slices in total.
+%We adopt the SRAM-based design of \cite{aysu2015end} to implement the TRNG. The advantage is that the SRAM cells used to generate $\mathbf{s}$ can be reused for the SRAM-TRNG design. 
+%We adopt the 8-fold XORing of SRAM bits in \cite{aysu2015end} and therefore need $10.06K$ (i.e. $3.7K$ additional) SRAM cells. 
+%The 8-fold XORing logic design requires $1$ slice. 
+%Then, for the $5\%$ raw BER, the RFE design requires $27$ slices in total. 
 
 
 %\begin{table}[t!]
@@ -236,7 +256,7 @@ Then, for the $5\%$ raw BER, the RFE design requires $27$ slices in total.
 %The cost of FE/RFE applies to all other strong PUF candidates (AES PUF or other controlled PUF).
 %This is also cheaper than linear solver block used in the CFE-based strong PUF \cite{herder2017trapdoor,jin2017fpga} for key reconstruction, which requires $65,700$ LUTs and $16,425$ slices.
 
-The lattice PUF (without RFE) takes a total of 45 slices on Spartan-6 FPGA. The LFSR and the controller occupies most of the slices. Table %\ref{table:fpga_utilization}
+The lattice PUF (without FE) takes a total of 45 slices on Spartan-6 FPGA. The LFSR and the controller occupies most of the slices. Table %\ref{table:fpga_utilization}
 \ref{table:fpga_result}(a) shows the resources breakdown of each module. The decryption function of LWE (LWEDec) is implemented with MAC unit of 8 bits and a block for MAC result quantization, Figure \ref{fig:lwedec}.
 RAM-based shift registers are used to implement the 256-bit LFSR. It takes $47\mu$s in total to generate a single PUF response bit under a clock running at 33.3MHz. 100 PUF response bits require about $4.4ms$ ($8\mu s + 100\times 44\mu s$) in total. Table %\ref{table:fpga_timing} 
 \ref{table:fpga_result}(b) shows latency of each procedure to produce a PUF response.
@@ -291,11 +311,11 @@ In addition, we observe the MAC unit parallelization strategy has better hardwar
         \begin{tabular}{|c|c|c|c|c|c|c|}
         \hline
         \textbf{Design} & \textbf{Platform} & \begin{tabular}[c]{@{}c@{}}\textbf{PUF Logic}\\ \textbf{[Slices]}\end{tabular} & \begin{tabular}[c]{@{}c@{}@{}@{}}\textbf{Error-}\\ \textbf{Correction}\\\textbf{Code}\\ \textbf{[Slices]}\end{tabular} & \begin{tabular}[c]{@{}c@{}}\textbf{POK}\\ \textbf{[Bits]}\end{tabular} & \begin{tabular}[c]{@{}c@{}}\textbf{Response}\\ \textbf{[Bits]}\end{tabular} & \begin{tabular}[c]{@{}c@{}}\textbf{Latency}\\ \textbf{[$\mu$s]}\end{tabular} \\\hline
-        POK+AES \cite{bhargava2014efficient} & Spartan 6 & 80 & 27 & 612 & 128 & 2.2\\ \hline
-        Controlled PUF \cite{gassend2008controlled} & Spartan 6 & 127 & 27 & 612 & 256 & 19.1\\ \hline
+        POK+AES \cite{bhargava2014efficient} & Spartan 6 & 80 & 340 & 612 & 128 & 2.2\\ \hline
+        Controlled PUF \cite{gassend2008controlled} & Spartan 6 & 127 & 340 & 612 & 256 & 19.1\\ \hline
         \begin{tabular}[c]{@{}c@{}}CFE-based PUF\\ \cite{herder2017trapdoor,jin2017fpga}\end{tabular} & Zynq-7000 & 9,225 & 0 & 450\tablefootnote{The POK is based on RO PUF and assumes a different BER.} & 256 & 658\tablefootnote{Zynq-7000 device typically runs faster than Spartan-6 device.}\\ \hline
-        \begin{tabular}[c]{@{}c@{}}Lattice PUF\\ (resource-efficient)\end{tabular} & Spartan 6 & 45 & 26 & 6,360 & 128 & 5,632\\ \hline
-        \begin{tabular}[c]{@{}c@{}}Lattice PUF\\ (latency-optimized)\end{tabular} & Spartan 6 & 465 & 26 & 6,360 & 128 & 38\\ \hline
+        \begin{tabular}[c]{@{}c@{}}Lattice PUF\\ (resource-efficient)\end{tabular} & Spartan 6 & 45 & 351 & 6,360 & 128 & 5,632\\ \hline
+        \begin{tabular}[c]{@{}c@{}}Lattice PUF\\ (latency-optimized)\end{tabular} & Spartan 6 & 465 & 351 & 6,360 & 128 & 38\\ \hline
         \end{tabular}
     }
     \vspace{1em}
@@ -325,21 +345,37 @@ In addition, we observe the MAC unit parallelization strategy has better hardwar
     \label{table:ecc}
 \end{table}
 
-\begin{table*}[t!]
-    \centering
+%\begin{table*}[t!]
+%    \centering
     %\caption{Hardware utilization in ECC encoder design on Spartan 6 FPGA.}
     %\label{table:hardware_fe}
+%        \begin{tabular}{|c|c|c|c|c|c|c|c|c|c|}
+%        \hline
+%        \multirow{2}{*}{\begin{tabular}[c]{@{}c@{}}\textbf{Raw BER}\\  \textbf{(\%)}\end{tabular}} & \multicolumn{3}{c|}{\textbf{Outer Code}} & \multicolumn{3}{c|}{\textbf{Inner Code}} & \multicolumn{3}{c|}{\textbf{Total}} \\ \cline{2-10} 
+%                               & Reg      & LUT      & Slice     & Reg      & LUT      & Slice     & Reg    & LUT    & Slice    \\ \hline
+%        1                      & 112      & 93       & 30        & 0        & 0        & 0         & 112    & 93     & 30       \\ \hline
+%        5                      & 96       & 78       & 25        & 1        & 1        & 1         & 97     & 79     & 26       \\ \hline
+%        10                     & 96       & 83       & 28        & 1        & 1        & 1         & 97     & 84     & 29       \\ \hline
+%        15                     & 120      & 105      & 35        & 1        & 1        & 1         & 121    & 106    & 36       \\ \hline
+%        \end{tabular}
+%        \vspace{1em}
+%        \caption{Hardware utilization in ECC encoder design on Spartan 6 FPGA.}
+%    \label{table:hardware_fe}
+%\end{table*}
+
+\begin{table*}[t!]
+    \centering
         \begin{tabular}{|c|c|c|c|c|c|c|c|c|c|}
         \hline
         \multirow{2}{*}{\begin{tabular}[c]{@{}c@{}}\textbf{Raw BER}\\  \textbf{(\%)}\end{tabular}} & \multicolumn{3}{c|}{\textbf{Outer Code}} & \multicolumn{3}{c|}{\textbf{Inner Code}} & \multicolumn{3}{c|}{\textbf{Total}} \\ \cline{2-10} 
                                & Reg      & LUT      & Slice     & Reg      & LUT      & Slice     & Reg    & LUT    & Slice    \\ \hline
-        1                      & 112      & 93       & 30        & 0        & 0        & 0         & 112    & 93     & 30       \\ \hline
-        5                      & 96       & 78       & 25        & 1        & 1        & 1         & 97     & 79     & 26       \\ \hline
-        10                     & 96       & 83       & 28        & 1        & 1        & 1         & 97     & 84     & 29       \\ \hline
-        15                     & 120      & 105      & 35        & 1        & 1        & 1         & 121    & 106    & 36       \\ \hline
+        1                      & 899      & 842       & 431        & 0        & 0        & 0         & 899    & 842     & 431       \\ \hline
+        5                      & 723       & 650       & 350        & 1        & 2        & 1         & 724     & 652     & 351       \\ \hline
+        10                     & 777       & 696       & 386        & 1        & 5        & 2         & 778     & 701     & 388       \\ \hline
+        15                     & 963      & 905      & 442        & 1        & 3        & 1         & 964    & 908    & 443       \\ \hline
         \end{tabular}
         \vspace{1em}
-        \caption{Hardware utilization in ECC encoder design on Spartan 6 FPGA.}
+        \caption{Hardware utilization in FE design on Spartan 6 FPGA.}
     \label{table:hardware_fe}
 \end{table*}
 
@@ -395,14 +431,14 @@ In addition, we observe the MAC unit parallelization strategy has better hardwar
 %\label{fig:design_space_hw}
 %\end{figure}
 
-We finally compare the hardware utilization and latency of lattice PUF designs to several published strong PUF designs \cite{bhargava2014efficient, gassend2008controlled, jin2017fpga} who also have ML resistance in Table \ref{table:hardware_puf}. 
+We finally compare the hardware utilization and latency of lattice PUF designs to several published strong PUF designs \cite{bhargava2014efficient, gassend2008controlled, jin2017fpga} which also have ML resistance in Table \ref{table:hardware_puf}. 
 As mentioned in Section \ref{sec:intro}, there are two different categories of ML resistance among those listed PUFs. 
 ML resistance of the AES-based PUF and the controlled PUF can be reduced to the security of the deployed primitives. 
 In contrast, the theoretical ML resistance of the CFE-based strong PUF and our lattice PUF can be reduced to the hardness of fundamental math problems, like LPN and LWE.
 The original proposal of the AES-based strong PUF \cite{bhargava2014efficient} is an ASIC implementation. 
 Here, to estimate the AES implementation cost in FPGA, we adopt results in \cite{chu2012low}.
 Note that the original proposal of \cite{bhargava2014efficient} does not use FE-based error correction: it uses dark bit masking to guarantee reliability. 
-To estimate the cost of its error correction on an FPGA implementation, we use the RFE encoder design for a 128-bit key reconstruction with a $5\%$ raw BER and $10^{-6}$ failure rate, similar to the ECC design for the lattice PUF. The estimated number of raw POK bits are derived using these parameters.
+To estimate the cost of its error correction on an FPGA implementation, we use the FE design for a 128-bit key reconstruction with a $5\%$ raw BER and $10^{-6}$ failure rate, similar to the ECC design for the lattice PUF. The estimated number of raw POK bits are derived using these parameters.
 Similarly, to calculate hash function hardware utilization in the controlled PUF \cite{gassend2008controlled}, the FPGA implementation results of SHA-3 in \cite{sha3_finalist} is used. 
 No design details of the error correction and the POK are given in the proposal of controlled PUF \cite{gassend2008controlled}. We follow the same assumption as for the AES PUF for estimation.
 \cite{jin2017fpga} reports the hardware utilization results of the computational FE (CFE) based strong PUF on FPGA in the LUT numbers.

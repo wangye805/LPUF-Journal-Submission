@@ -103,11 +103,11 @@ The mean (standard deviation) of uniformity is $49.98\%$ ($1.58\%$), and of inte
 The mean BER (intra-class HD) is $1.26\%$.
 Although we establish the security of lattice PUF theoretically, we perform empirical validation as a way to explore the possible attacks of distributional relaxations used, and as a way to give added overall confidence in the design. We test empirical ML resistance of lattice PUF with both conventional ML algorithms and more powerful deep neural networks (DNNs). The prediction error remains close to $50\%$ even after 1M training CRPs.
 A $1280$-bit secret key is required by the proposed lattice PUF.
-To reconstruct the stable POK bits efficiently, the construction uses a concatenated-code-based reverse fuzzy extractor (RFE). 
-We also provide an end-to-end authentication scheme with the lattice PUF and RFE.
+To reconstruct the stable POK bits efficiently, the construction uses a concatenated-code-based fuzzy extractor (FE). 
+We also provide an end-to-end authentication scheme with the lattice PUF and FE.
 With a $5\%$ bit error rate (BER) in SRAM cells, $6.36K$ cells are required to achieve a $10^{-6}$ failure rate in key reconstruction.
-The TRNG in the RFE needs $3.7K$ additional SRAM cells. 
+%The TRNG in the RFE needs $3.7K$ additional SRAM cells. 
 We implement the entire lattice PUF (except for raw SRAM cells) on a Spartan 6 FPGA.
 The resource-efficient design consumes only $45$ slices. 
-The concatenation-code-based RFE takes $27$ slices. 
+The concatenation-code-based FE takes $351$ slices. 
 The latency-optimized design achieves a 148X latency reduction (to about 10 cycles per response bit generation), at the cost of a 10X increase in hardware utilization and 2.4X increase in communication.

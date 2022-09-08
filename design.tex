@@ -13,7 +13,7 @@ The top-level architecture of the proposed lattice PUF is shown in Figure \ref{f
 
 
 
-\subsection{Construct Strong PUF from LWE Decryption Function}
+\subsection{Constructing Strong PUF from LWE Decryption Function}
 \label{sec:lwe_dec}
 \begin{figure}[t!]
     \centering
@@ -113,7 +113,7 @@ Considering the design metrics above, a feasible set of parameters is found usin
 By setting $n=160$, $q=256$, $m=256$ and $\alpha = 2.20\%$, we achieve a lattice PUF with $128$-bit concrete hardness and a decryption error rate of $1.26\%$.
 
 In order to get a $1$-bit response, $(n+1)\log q = 1288$ bits need to be sent to the lattice PUF as a challenge.
-For direct authentication applications, usually around $100$ bits of responses are required. Therefore, the direct implementation described so far would require $C = 128.8K$ challenge bits.
+For direct authentication applications, usually around $\text{Len}=100$ bits of responses are required. Therefore, the direct implementation described so far would require $C = 128.8K$ challenge bits.
 This high ratio of challenge length to response length limits its practical use in many scenarios when communication is expensive.
 
 %\textcolor{red}{A class of attacks which manipulates public helper data to exploit PUF generated keys can compromise PUF security \cite{helper_data_manipulation}. Such attacks apply to pairing-based PUFs (for instance, RO PUFs), and require public access to helper data. However, such attacks may not be applicable to our construction, since our POK is based on the SRAM PUF, which follows a completely different mechanism. In addition, the possibility of the attacks can be reduced by limiting public access to helper data. Therefore, the helper data manipulation attack is not a major concern for our design.}
@@ -341,27 +341,35 @@ However, the MAC unit parallelization cannot achieve arbitrary parallelism since
 
 \subsection{PUF-Based Authentication}
 As an example application, we study using the lattice PUF in a string-matching authentication scheme \cite{suh2007physical}. 
-To reconstruct the same secret key from POK bits each time, we adopt the fuzzy extractor (FE) \cite{bosch2008efficient} method to achieve a low failure rate. 
-Figure \ref{fig:protocol} shows the operations of an end-to-end authentication method using the lattice PUF. 
-
+Figure \ref{fig:protocol} describes an end-to-end authentication method using the lattice PUF. 
 % Figure \ref{fig:authen_system} shows the building blocks of an authentication scheme based on the lattice PUF. 
 % The device contains a POK generator, an FE block (\texttt{FE.Gen} and \texttt{FE.Rec}), and a lattice PUF. 
 % The server has a database (\texttt{DB}) to store the secret key from the lattice PUF and the valid CRPs generated from enrollment phase.
 % Our threat model assumes that the device operates in the field and is the target of ML attacks. 
 % %We consider the server to be in a physically secure location, with the \texttt{DB} storing the POK bits and the sever-side lattice PUF being secret. 
 
-During the enrollment phase, the server reads out the power-up values of SRAM cells through a one-time interface, runs the helper data generation block in FE \texttt{FE.Gen} (for subsequent reconstructions), and stores both secret key $\mathbf{s}$ and helper data $\mathbf{h}$ in the server \texttt{DB}.
+A fuzzy extractor \cite{bosch2008efficient} is used for reconstructing a stable secret key from the POK bits.
+During the enrollment phase, the POK bits, based on the power-up values of SRAM cells, are read out through a one-time interface and sent to the server. The fuzzy extractor generates helper data 
+%as part of generation block in FE \texttt{FE.Gen} (
+for subsequent reconstruction, and both the secret key $\mathbf{s}$ and helper data $\mathbf{h}$ are stored in the server \texttt{DB}.
+
 Note that there is a critical difference between the PUF and the public key cryptosystem use-cases:
 for applications using public key cryptosystem, there is only an insecure public channel assumed,
 while for applications using PUFs, secret information can be transferred in a secure manner.
 Since only a public key can be transferred, for a direct implementation of the LWE cryptosystem, the device side has to perform the public key generation including the relatively expensive discrete Gaussian sampling. 
+
 With $\mathbf{s}$ securely transferred to the server side in PUF enrollment phase, the computationally expensive discrete Gaussian sampling ($\mathbf{e}$) can happen on the server side rather than the PUF side.
 Moreover, keeping $\mathbf{s}$ on the server side also enables challenge compression via dimension relaxation. 
-Upon receiving the secret $\mathbf{s}$, the server performs CRP generation and stores them, as shown in Figure \ref{fig:protocol}.
+Once the discrete Gaussian sampling is done, the server performs N blocks of CRP generation and stores the results, as shown in Figure \ref{fig:protocol}.
+Each blocks shares the same LFSR seed, samples a string $\mathbf{r}$ with length $\text{Len}$, a binary matrix $\mathbf{X}$ of dimension $m\times \text{Len}$, and calculates a vector $\mathbf{b}^\prime$ of length $\text{Len}$, in which $\text{Len}$ is the length of PUF responses required by one authentication.  
 
-During each authentication, the error correction uses the decoder of a concatenated code. 
-If the HD between $\mathbf{s}$ and $\mathbf{s}_R$ is within the error-decoding capability of the error correction code (ECC) decoder, the device reconstructs the correct secret key $\mathbf{s}$ with the helper data. 
-Finally, the server sends the valid challenge $ch=(\text{seed}_{\mathbf{a}^\prime}, \mathbf{b}')$ to the device. 
-The device generates the PUF response $\mathbf{r}_R$ by running the PUF function $\mathbf{r}_R = \text{PUF}(ch, \mathbf{s})$ and sends it to the server. 
-The server compares $\mathbf{r}_R$ with the response $\mathbf{r}$ stored in DB:
+During each authentication, the server sends to the device a valid challenge  $ch=(\text{seed}_{\mathbf{a}^\prime}, \mathbf{b}')$ of one block from the DB and a device-specific helper data. 
+%The error correction uses the decoder of a concatenated code
+If the HD between $\mathbf{s}$ and $\mathbf{s}_R$ is within the error-decoding capability of the error correction code (ECC) decoder, the decoder succeeds in reconstructs the correct secret key  $\mathbf{s}$. 
+
+The device generates the PUF response $\mathbf{r}_R$ by executing the LWE decryption function with $(ch, \mathbf{s})$ and sends it back to the server. 
+%The above transaction is repeated for $n$ times in order to produce a $n$-bit string for authentication.
+%[OUR responses are one-bit. Need to DESCRIBE THE LENGTH OF THE STRING. OTHERWISE THE THRESHOLD BELOW DOESN'T MAKE SENSE]
+The server compares the $\text{Len}$-bit $\mathbf{r}_R$ string with the corresponding $\text{Len}$-bit $\mathbf{r}$ string stored in DB:
 the device is accepted if $\text{HD}(\mathbf{r}_R, \mathbf{r})$ is less than a given threshold $th$.
+%the device is accepted if $\text{HD}(\mathbf{r}_R \ \text{string}, \mathbf{r} \ \text{string})$ is less than a given threshold $th$.
