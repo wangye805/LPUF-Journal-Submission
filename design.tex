@@ -365,7 +365,7 @@ Each blocks shares the same LFSR seed, samples a string $\mathbf{r}$ with length
 
 During each authentication, the server sends to the device a valid challenge  $ch=(\text{seed}_{\mathbf{a}^\prime}, \mathbf{b}')$ of one block from the DB and a device-specific helper data. 
 %The error correction uses the decoder of a concatenated code
-If the HD between $\mathbf{s}$ and $\mathbf{s}_R$ is within the error-decoding capability of the error correction code (ECC) decoder, the decoder succeeds in reconstructs the correct secret key  $\mathbf{s}$ (\texttt{FE.Rec}). 
+If the HD between $\mathbf{s}$ and $\mathbf{s}_R$ is within the error-decoding capability of the error correction code (ECC) decoder, the decoder reconstructs the correct secret key $\mathbf{s}$ (\texttt{FE.Rec}). 
 
 The device generates the PUF response $\mathbf{r}_R$ by executing the LWE decryption function with $(ch, \mathbf{s})$ and sends it back to the server. 
 %The above transaction is repeated for $n$ times in order to produce a $n$-bit string for authentication.
