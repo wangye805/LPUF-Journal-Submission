@@ -49,11 +49,10 @@ The ideal uniformity is 0.5, which indicates the zero bits and the one bits are 
 The ideal uniqueness is 0.5, which means each PUF instance produces a unique response distribution. \textbf{Reliability} measures the mean Hamming Distance between actual PUF responses and the enrolled (ideal) PUF responses (intra-class HD). 
 The ideal PUF is expected to have no bit flips in responses compared to the enrolled values.
 
-We evaluate the metrics with 1000 lattice PUF instances and 1000 random challenges following LWE ciphertext distribution. 
-In generation of the LWE ciphertext distribution, the plaintext $r$ is unbiased since it is generated from a uniform binary distribution. 
-However, when applying the corresponding ciphertext $\mathbf{c}$ to a lattice PUF, its actual output $\mathbf{r}_R$ of may not always be the same as $r$ due to the decryption error. 
-Recall in Section \ref{sec:design}, the decryption error rate is targeted at 1.26\%. 
-Therefore, the uniformity and uniqueness tests are performed based on the actual outputs $\mathbf{r}_R$'s.
+We evaluate the metrics %with 1000 lattice PUF instances and 
+using 1000 random challenges.
+Note that during CRP generation, the plaintext $r$ is unbiased since it is sampled from a uniform binary distribution. However, when evaluating the lattice PUF response to a particular challenge (ciphertext) $\mathbf{c}$, its actual output $\mathbf{r}_R$ may not match $r$ due to a possibility of decryption error. (Recall from Section \ref{sec:design}, the decryption error rate is targeted at 1.26\%.) 
+Therefore, uniformity and uniqueness tests capture the impact of decryption errors on statistical properties of the PUF's true output $\mathbf{r}_R$.
 
 The lattice PUF demonstrates near ideal statistical properties: the mean of uniformity distribution is 0.4998 (std = 0.0158) and the mean of uniqueness distribution is 0.5 (std = 0.0158). 
 To evaluate PUF reliability, we assume the key reconstruction process is ideal and the errors merely come from LWE decryption. 

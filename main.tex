@@ -91,7 +91,7 @@
 
 \title{A Provably Secure Strong PUF based on LWE: Construction and Implementation}
 
-\author{Xiaodan Xi\textsuperscript{*}, Ge Li\textsuperscript{*}, Ye Wang, and Michael Orshansky
+\author{Xiaodan Xi\textsuperscript{*}, Ge Li\textsuperscript{*}, Ye Wang, Yeonsoo Jeon, and Michael Orshansky
 
 \IEEEcompsocitemizethanks{\IEEEcompsocthanksitem The authors are with the Department of Electrical and Computer Engineering, The University of Texas at Austin, Austin, TX, 78712, USA.\protect\\
 E-mail: paul.xiaodan@utexas.edu; lige@utexas.edu; lhywang@utexas.edu; orshansky@utexas.edu
@@ -123,13 +123,13 @@ We construct a strong PUF with provable security against ML attacks on both clas
 We construct lattice PUF with a physically obfuscated key and an LWE decryption function block. To allow deployments in different scenarios, we demonstrate designs with different latency-area trade-offs. A compact design uses a highly serialized LFSR and LWE decryption function, while a latency-optimized design uses an unrolled LFSR and a parallel datapath.
 
 
-We prototype lattice PUF designs with $2^{136}$ challenge-response pairs (CRPs) on a Spartan 6 FPGA. In addition to theoretical security guarantee, we evaluate empirical resistance to the various leading ML techniques: the prediction error remains above $49.76\%$ after $1$ million training CRPs. The resource-efficient design requires only $45$ slices for PUF logic proper, and $351$ slices for FE. The latency-optimized design achieves a $148X$ reduction in latency, at a $10X$ increase in PUF hardware utilization. The mean uniformity of PUF responses is $49.97\%$, the mean uniqueness is $50.00\%$, and the mean reliability is $1.26\%$.
+We prototype lattice PUF designs with $2^{136}$ challenge-response pairs (CRPs) on a Spartan 6 FPGA. In addition to theoretical security guarantee, we evaluate empirical resistance to the various leading ML techniques: the prediction error remains above $49.76\%$ after $1$ million training CRPs. The resource-efficient design requires only $45$ slices for the PUF logic proper, and $351$ slices for a fuzzy extractor. The latency-optimized design achieves a $148X$ reduction in latency, at a $10X$ increase in PUF hardware utilization. The mean uniformity of PUF responses is $49.97\%$, the mean uniqueness is $50.00\%$, and the mean reliability is $1.26\%$.
 
 \end{abstract}
 
 % Note that keywords are not normally used for peerreview papers.
 \begin{IEEEkeywords}
-Strong PUF, PAC Learning, Lattice Cryptography, ML Resistance, Design Space Exploration.
+Strong PUF, PAC Learning, Lattice Cryptography, ML Resistance.
 \end{IEEEkeywords}}
 
 %\IEEEauthorblockA{\textit{Department of Electrical and Computer Engineering} \\

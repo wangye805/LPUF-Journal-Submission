@@ -353,17 +353,14 @@ During the enrollment phase, the POK bits, based on the power-up values of SRAM 
 %as part of generation block in FE \texttt{FE.Gen} (
 for subsequent reconstruction, and both the secret key $\mathbf{s}$ and helper data $\mathbf{h}$ are stored in the server \texttt{DB}.
 
-Note that there is a critical difference between the PUF and the public key cryptosystem use-cases:
-for applications using public key cryptosystem, there is only an insecure public channel assumed,
-while for applications using PUFs, secret information can be transferred in a secure manner.
-Since only a public key can be transferred, for a direct implementation of the LWE cryptosystem, the device side has to perform the public key generation including the relatively expensive discrete Gaussian sampling. 
+Note that there is a critical difference between the PUF and the public key cryptosystem use-cases. Conventional applications using a public key cryptosystem assume that only an insecure public channel is available to communicating parties. 
+This requires that public key generation takes place on the device. In a LWE-based PKE, that requires implementing on the device the relatively expensive discrete Gaussian sampling mechanism. In contrast, a typical assumption of secure protocols utilizing PUF-based authentication is that during the \emph{enrollment phase}, secret information can be transferred in a secure manner. With $\mathbf{s}$ securely transferred to the server side during the enrollment phase, the computationally costly discrete Gaussian sampling ($\mathbf{e}$) can happen on the server rather than the PUF (device) side.
+We highlight again that it is the availability of $\mathbf{s}$ on the server that enables challenge compression via distributional relaxation and the corresponding design improvements. 
 
-With $\mathbf{s}$ securely transferred to the server side in PUF enrollment phase, the computationally expensive discrete Gaussian sampling ($\mathbf{e}$) can happen on the server side rather than the PUF side.
-Moreover, keeping $\mathbf{s}$ on the server side also enables challenge compression via dimension relaxation. 
-Once the discrete Gaussian sampling is done, the server performs N blocks of CRP generation and stores the results, as shown in Figure \ref{fig:protocol}.
-Each blocks shares the same LFSR seed, samples a string $\mathbf{r}$ with length $L$, a binary matrix $\mathbf{X}$ of dimension $m\times L$, and calculates a vector $\mathbf{b}^\prime$ of length $L$, in which $L$ is the length of PUF responses required by one authentication.  
+Once the discrete Gaussian sampling is done, the server generates and stores N blocks of CRP, as shown in Figure \ref{fig:protocol}.
+Each block shares the same LFSR seed, samples a string $\mathbf{r}$ with length $L$, a binary matrix $\mathbf{X}$ of dimension $m\times L$, and calculates a vector $\mathbf{b}^\prime$ of length $L$, in which $L$ is the length of PUF responses required by one authentication.  
 
-During each authentication, the server sends to the device a valid challenge  $ch=(\text{seed}_{\mathbf{a}^\prime}, \mathbf{b}')$ of one block from the DB and a device-specific helper data. 
+During each authentication, the server sends a valid block of challenge  $ch=(\text{seed}_{\mathbf{a}^\prime}, \mathbf{b}')$ and a device-specific helper data to the device. 
 %The error correction uses the decoder of a concatenated code
 If the HD between $\mathbf{s}$ and $\mathbf{s}_R$ is within the error-decoding capability of the error correction code (ECC) decoder, the decoder reconstructs the correct secret key $\mathbf{s}$ (\texttt{FE.Rec}). 
 
