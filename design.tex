@@ -2,7 +2,7 @@
 \label{sec:design}
 \begin{figure}[t!]
     \centering
-    \includegraphics[width = 1.0\linewidth]{./figs/top_level_arch_redraw.pdf}    \caption{Top-level architecture and data flow of the lattice PUF.}
+    \includegraphics[width = 1.0\linewidth]{./figs/top_level_arch_new.pdf}    \caption{Top-level architecture and data flow of the lattice PUF.}
     \label{fig:fpga_impl}
 \end{figure}
 %\textcolor{red}{The theoretical security guarantees in Section \ref{sec:lwe} shows that an LWE decryption function can be used as a strong PUF with challenges generated from a ciphertext distribution. 
@@ -18,11 +18,11 @@ The top-level architecture of the proposed lattice PUF is shown in Figure \ref{f
 \begin{figure}[t!]
     \centering
     \includegraphics[width = 0.8\linewidth]{./figs/lwe_dec.pdf}
-    \caption{Architecture of LWE decryption function.}
+    \caption{Architecture of LWEDec block.}
     \label{fig:lwedec}
 \end{figure}
 
-Figure \ref{fig:lwedec} shows the architecture of LWE decryption function. 
+Figure \ref{fig:lwedec} shows the architecture of LWE decryption (LWEDec) block. 
 It takes a binary challenge vector $\mathbf{c} = \{c_0,c_1,\ldots,c_{N-1}\}$ of size $N = (n+1)\log q$ which maps to a ciphertext $(\mathbf{a},b)$ in the following way:
 \begin{align*}
 a_i &= \sum_{j=0}^{\log q-1}c_{(i-1)\log q+j}2^j,\; \forall i\in \{1,2,\ldots,n\}, \\
@@ -34,7 +34,7 @@ Similarly, the private key $\mathbf{s}$ for the corresponding LWE decryption fun
 \begin{equation*}
 s_i=\sum_{j=0}^{\log q-1} W_{(i-1)\log q+j} 2^j,\; \forall i\in \{1,2,\ldots,n\}.
 \end{equation*}
-A modulo-dot-product $b-\innerprod{\mathbf{a},\mathbf{s}}$ is computed using the modulo-multiply-accumulate unit. 
+A modulo-dot-product $b-\innerprod{\mathbf{a},\mathbf{s}}$ is computed using the modulo-MAC unit. 
 It can be implemented in a serial way using $n$ stages. 
 Recall that all additions and multiplications are performed in modulo $q$.
 Since $q$ is a power of $2$ in our construction, modulo addition and multiplication can be naturally implemented by integer addition and multiplication that keep only the last $\log q$-bit result. 
@@ -63,7 +63,7 @@ For a given set of parameters, the estimator compares the complexity of several 
 \cite{howgrave2007hybrid,lindner2011better}. 
 We utilize the estimator in a black-box fashion to find the set of parameters with the target of $128$-bit concrete ML resistance. 
 
-We consider two metrics of implementation cost, both of which scale with $n$: the number of challenge and secret bits needed ($n\log q$), and the number of multiply-accumulate (MAC) operations ($n$).
+We consider two metrics of implementation cost, both of which scale with $n$: the number of challenge and secret bits needed ($n\log q$), and the number of MAC operations ($n$).
 This motivates the need to decrease $n$.
 %\begin{figure}[t!]
 %\centering
@@ -81,7 +81,7 @@ Since a single bit-flip completely changes the challenge-response behavior of LW
 Section \ref{sec:result} describes how the target failure rate can be achieved via a conventional FE based on the error-correcting codes.
 The latter corresponds to the decryption error and is orthogonal to errors in the secret key $\mathbf{s}$. 
 Recall that in CRP generation of the lattice PUF, a bit of plaintext $r$ is sampled and the ciphertext $\mathbf{c}$ is produced by a noisy encryption function $\mathbf{c}=\Enc(r)$. 
-Given ciphertext $\mathbf{c}$ as input challenge, the decryption function can output a wrong response $r^\prime\neq r$ when the accumulated error $\sum_{i\in S} e_i$ in the encryption function exceeds the decision boundary.
+Given ciphertext $\mathbf{c}$ as input challenge, the decryption function can output a wrong response $\tilde{r}\neq r$ when the accumulated error $\sum_{i\in S} e_i$ in the encryption function exceeds the decision boundary.
 
 %\begin{figure}[t!]
 %\centering
@@ -112,8 +112,8 @@ It shows that, at fixed concrete ML hardness, the decryption error rate decrease
 Considering the design metrics above, a feasible set of parameters is found using the estimator in \cite{albrecht2015concrete}.
 By setting $n=160$, $q=256$, $m=256$ and $\alpha = 2.20\%$, we achieve a lattice PUF with $128$-bit concrete hardness and a decryption error rate of $1.26\%$.
 
-In order to get a $1$-bit response, $(n+1)\log q = 1288$ bits need to be sent to the lattice PUF as a challenge.
-For direct authentication applications, usually around $\text{Len}=100$ bits of responses are required. Therefore, the direct implementation described so far would require $C = 128.8K$ challenge bits.
+In order to get a $1$-bit response, $N = (n+1)\log q = 1288$ bits need to be sent to the lattice PUF as a challenge.
+For direct authentication applications, usually around $L = 100$ bits of responses are required. Therefore, the direct implementation described so far would require $128.8K$ challenge bits.
 This high ratio of challenge length to response length limits its practical use in many scenarios when communication is expensive.
 
 %\textcolor{red}{A class of attacks which manipulates public helper data to exploit PUF generated keys can compromise PUF security \cite{helper_data_manipulation}. Such attacks apply to pairing-based PUFs (for instance, RO PUFs), and require public access to helper data. However, such attacks may not be applicable to our construction, since our POK is based on the SRAM PUF, which follows a completely different mechanism. In addition, the possibility of the attacks can be reduced by limiting public access to helper data. Therefore, the helper data manipulation attack is not a major concern for our design.}
@@ -123,7 +123,7 @@ This high ratio of challenge length to response length limits its practical use 
 \subsection{Challenge Compression through Distributional Relaxation}
 \label{sec:lfsr}
 %We now describe the proposed strategy based on space-efficient LWE that overcomes the limitation on communication inefficiency.
-The LWE decryption function described in Section \ref{sec:lwe_dec} requires a challenge $\mathbf{c}$ in the form $\mathbf{c}=(\mathbf{a},b)$ to be sent from the server to the PUF. 
+The LWEDec block described in Section \ref{sec:lwe_dec} requires a challenge $\mathbf{c}$ in the form $\mathbf{c}=(\mathbf{a},b)$ to be sent from the server to the PUF. 
 To represent vector $\mathbf{a} \in \mathbb{Z}_q^n$ requires $n\log q$ bits while to represent scalar $b \in \mathbb{Z}_q$  requires only $\log q$ bits. 
 Thus, the major cost of transmission lies in sending $\mathbf{a}$. 
 We wish to avoid sending $\mathbf{a}$ directly and, instead, to send a compressed (shorter) version of $\mathbf{a}$  and re-generate its full-size version on the PUF.
@@ -183,8 +183,8 @@ Here $\LFSR(\cdot)$ denotes the output generated by an LFSR.
 %\label{fig:protocol}
 %\end{figure}
 
-With LWE parameters chosen as Section \ref{sec:lwe_dec}, using a seed of length $l=256$ is able to reduce the challenge length from $1288$ to $256+8=264$ per one bit of response. 
-The improvement of efficiency becomes more pronounced for generating multiple responses:
+With LWE parameters chosen as Section \ref{sec:lwe_dec}, using a seed of length $256$ is able to reduce the challenge length from $1288$ to $256+8=264$ per one bit of response. 
+The improvement of efficiency becomes more pronounced for generating multi-bit responses:
 This is because $\mathbf{a}^\prime_1 \ldots \mathbf{a}^\prime_t$ can be generated sequentially from the $l$-bit seed, so that only the seed and $b^\prime_1,\ldots, b^\prime_t \in Z_q$ are required to be sent to the PUF side. 
 $100$ bits of responses now require only transmitting $256+100\times\log 256 = 1056$ bits for challenges.
 
@@ -216,7 +216,7 @@ Gaussian elimination can then be used to solve for $\mathbf{s}$, entailing compr
 
 %We overcome the risk of such an attack by adopting the technique in \cite{yu2016lockdown}: we introduce a self-incrementing counter to embed the counter value into a challenge seed.
 To defend against the attack, we introduce a self-incrementing counter to embed the counter value into a challenge seed \cite{yu2016lockdown}.
-This makes the attack impossible as the counter restricts the attacker's ability to completely control input challenges to the LWE decryption function.
+This makes the attack impossible as the counter restricts the attacker's ability to completely control input challenges to the LWEDec block.
 As a result, the attacker cannot enumerate all values of $b$ while keeping $\mathbf{a}$ unchanged. 
 As shown in Figure \ref{fig:fpga_impl}, the concatenation of the challenger-provided seed and the counter value $t$ (i.e. $\text{seed}_{\mathbf{a}'}||t$) is used as the seed for generating $\mathbf{a}$. 
 The counter value is public and is incremented by $1$ on each response generation.
@@ -236,8 +236,8 @@ The lattice PUF architecture shown in Fig. \ref{fig:fpga_impl} achieves low hard
 However, the highly serialized design leads to inefficient utilization of clock cycles resulting in large response latency. To generate one bit of response, the design needs $160$ sequential MAC operations and each MAC needs to wait $8$ cycles until one byte of ciphertext is generated by the bit-serial LFSR. This is undesirable in performance-critical applications. %While the lightweight property is generally desired in a resource constrained environment, latency of response generation is also critical in a PUF-based application. 
 
 
-We observe that latency is limited by two factors: (1) the LFSR and LWE decryption function (LFSR-LWEDec) datapath produces response bits serially, and (2) the LWE decryption function performs a single MAC sequentially.  We optimize each aspect. %to reduce the overall latency.
-%\textcolor{red}{We keep LFSR in the latency-optimized design due to its capability of reducing challenge transmission cost, as illustrated in Section \ref{sec:lfsr}.}
+We observe that latency is limited by two factors: (1) the LFSR and LWEDec datapath (LFSR-LWEDec) produces response bits serially, and (2) the LWEDec block performs a single MAC sequentially.  
+We optimize each aspect.
 
 \begin{figure}[t!]
 \centering
@@ -246,13 +246,15 @@ We observe that latency is limited by two factors: (1) the LFSR and LWE decrypti
 \label{fig:lpuf_p1}
 \end{figure}
 
-We first parallelize the LFSR-LWEDec data-path which implements the functionality in response generation: the LFSR generates ciphertext and LWE decryption function performs modulo MAC operation. Parallelizing it allows multiple response bits to be generated simultaneously, Fig. \ref{fig:lpuf_p1}. Each LFSR-LWEDec data-path uses the same POK, but receives different LFSR seeds and ciphertext inputs. 
+We first parallelize the LFSR-LWEDec data-path which implements the functionality in response generation: the LFSR generates ciphertext and LWEDec block performs modulo MAC operation. 
+Parallelizing it allows multiple response bits to be generated simultaneously, Fig. \ref{fig:lpuf_p1}. Each LFSR-LWEDec data-path uses the same POK, but receives different LFSR seeds and ciphertext inputs. 
 
-We adapt the counter technique described in Section \ref{sec:counter}. %Specifically, we embed an increasing value into the LFSR seed for each LFSR-LWEDec data-path. The increasing values are counted from the output of a main counter, which increments by the number of parallel data-paths for each response generation. 
+We adapt the counter technique described in Section \ref{sec:counter}.  
 We embed an increasing counter value into the seed of each datapath, Fig. \ref{fig:lpuf_p1}. %On a design with $P_1$ parallel LFSR-LWEDec data-paths, 
 The strategy directly enables $P_1$ times reduction in response generation latency, at the cost of $P_1$ times increase in seed transmission and datapath hardware utilization.
 
-We now investigate how to increase the dot-product throughput in LWE decryption. Since the LWE decryption function contains only a single MAC unit, we increase the number of MACs. However, the throughput of the LFSR limits the overall throughput of the data-path: it produces only a single output bit per cycle. %For each MAC operation, the MAC unit has to wait until a full ciphertext byte ($q=256$) is generated. 
+We now investigate how to increase the dot-product throughput in LWEDec. 
+Since the LWEDec block contains only a single MAC unit, we increase the number of MACs. However, the throughput of the LFSR limits the overall throughput of the data-path: it produces only a single output bit per cycle. %For each MAC operation, the MAC unit has to wait until a full ciphertext byte ($q=256$) is generated. 
 Therefore, to fully utilize the parallel MAC units, the LFSR needs to produce a sufficient number of ciphertext bytes on each cycle. We adopt an unrolled LFSR to increase its throughput.
 
 \begin{figure}[t!]
@@ -319,9 +321,15 @@ The lowest 8 register bits latch values of the 8 feedback bits $X_{in} ^ 7$ to $
 
 Fig. \ref{fig:lfsr_unrolled} shows the architecture of the unrolled LFSR. It improves the throughput of the baseline bit-serial LFSR by 8X, at the cost of more XOR gates for computation.
 
-We implemented parallel MAC units in the LWE decryption function with an unrolled LFSR generating multiple bytes of ciphertext, Fig. \ref{fig:lpuf_p2}. We initialized the accumulation register of one of the MAC unit with ciphertext $b$, and the accumulation registers of the rest of MAC units to 0. On each cycle, each MAC unit accumulates the product of a byte of POK with the opposite of one byte of ciphertext $\mathbf{a}$ (Recall that the LWE decryption computes $b-\innerprod{\mathbf{a},\mathbf{s}}$). Finally the partial sums from each MAC unit are accumulated together to produce a dot-product result. The result is quantized and a response bit is produced. The increased number of MAC units reduces the number of MAC operations assigned to each unit, thus reducing the dot-product latency. On a design with $P_2$ parallel MAC units, the strategy reduces the dot-product latency for a response bit by a factor of $P_2$. The cost is the increase in hardware resource utilization due to an unrolled LFSR and the parallel MAC units.
+We implemented parallel MAC units in the LWEDec block with an unrolled LFSR generating multiple bytes of ciphertext, Fig. \ref{fig:lpuf_p2}. 
+We initialized the accumulation register of one of the MAC unit with ciphertext $b$, and the accumulation registers of the rest of MAC units to 0. 
+On each cycle, each MAC unit accumulates the product of a byte of POK with the opposite of one byte of ciphertext $\mathbf{a}$ 
+(Recall that the LWE decryption function computes $b-\innerprod{\mathbf{a},\mathbf{s}}$). 
+Finally the partial sums from each MAC unit are accumulated together to produce a dot-product result. The result is quantized and a response bit is produced. The increased number of MAC units reduces the number of MAC operations assigned to each unit, thus reducing the dot-product latency. On a design with $P_2$ parallel MAC units, the strategy reduces the dot-product latency for a response bit by a factor of $P_2$. The cost is the increase in hardware resource utilization due to an unrolled LFSR and the parallel MAC units.
 
-The LFSR-LWEDec datapath parallelization and MAC unit parallelization can be combined. Specifically, each parallel LFSR-LWEDec datapath can adopt an unrolled LFSR and a LWE decryption function with multiple MAC units. In practice, a user selects $P_1$ and $P_2$ values based on the latency requirement, resource budget, and the baseline LFSR implementation. MAC unit parallelization is more resource-efficient since the strategy only needs additional hardware for unrolled LFSR and MAC units. In contrast, the LFSR-LWEDec data-path parallelization requires duplication of the entire datapath. 
+The LFSR-LWEDec datapath parallelization and MAC unit parallelization can be combined. 
+Specifically, each parallel LFSR-LWEDec datapath can adopt an unrolled LFSR and a LWEDec block with multiple MAC units. 
+In practice, a user selects $P_1$ and $P_2$ values based on the latency requirement, resource budget, and the baseline LFSR implementation. MAC unit parallelization is more resource-efficient since the strategy only needs additional hardware for unrolled LFSR and MAC units. In contrast, the LFSR-LWEDec data-path parallelization requires duplication of the entire datapath. 
 
 However, the MAC unit parallelization cannot achieve arbitrary parallelism since the LFSR cannot be unrolled with an arbitrary factor. The LFSR generator polynomial limits the maximum unrolling factor, Fig. \ref{fig:lfsr_unrol_limit}. If the 256-bit LFSR takes the XOR result of $X_{255}$, $X_{253}$, $X_{250}$ and $X_{7}$ as the feedback bit, the LFSR cannot be unrolled by over 8 times with the demonstrated technique, since the LSB $X_{0}$ is only $7$ bits away from $X_{7}$. This indicates the unrolled LFSR cannot produce more than $8$ consecutive feedback bits utilizing consecutive register bits lower than $X_{7}$. The lowest LFSR bit involved in the feedback bit calculation determines the maximum unrolling times. LFSR-LWEDec data-path parallelization is a generic strategy. Its maximum parallelism is not constrained by any specific LFSR implementation. Therefore, in practice, the optimal strategy is to first seek parallelization via LFSR unrolling, and then parallelize the LFSR-LWEDec data-path to achieve further latency optimization once the unrolling of LFSR reaches the limit. We validate the strategy with a detailed design space exploration in Section \ref{sec:result}.
 
@@ -342,11 +350,6 @@ However, the MAC unit parallelization cannot achieve arbitrary parallelism since
 \subsection{PUF-Based Authentication}
 As an example application, we study using the lattice PUF in a string-matching authentication scheme \cite{suh2007physical}. 
 Figure \ref{fig:protocol} describes an end-to-end authentication method using the lattice PUF. 
-% Figure \ref{fig:authen_system} shows the building blocks of an authentication scheme based on the lattice PUF. 
-% The device contains a POK generator, an FE block (\texttt{FE.Gen} and \texttt{FE.Rec}), and a lattice PUF. 
-% The server has a database (\texttt{DB}) to store the secret key from the lattice PUF and the valid CRPs generated from enrollment phase.
-% Our threat model assumes that the device operates in the field and is the target of ML attacks. 
-% %We consider the server to be in a physically secure location, with the \texttt{DB} storing the POK bits and the sever-side lattice PUF being secret. 
 
 A fuzzy extractor \cite{bosch2008efficient} is used for reconstructing a stable secret key from the POK bits.
 During the enrollment phase, the POK bits, based on the power-up values of SRAM cells, are read out through a one-time interface and sent to the server. The fuzzy extractor generates helper data (\texttt{FE.Gen})
@@ -354,19 +357,21 @@ During the enrollment phase, the POK bits, based on the power-up values of SRAM 
 for subsequent reconstruction, and both the secret key $\mathbf{s}$ and helper data $\mathbf{h}$ are stored in the server \texttt{DB}.
 
 Note that there is a critical difference between the PUF and the public key cryptosystem use-cases. Conventional applications using a public key cryptosystem assume that only an insecure public channel is available to communicating parties. 
-This requires that public key generation takes place on the device. In a LWE-based PKE, that requires implementing on the device the relatively expensive discrete Gaussian sampling mechanism. In contrast, a typical assumption of secure protocols utilizing PUF-based authentication is that during the \emph{enrollment phase}, secret information can be transferred in a secure manner. With $\mathbf{s}$ securely transferred to the server side during the enrollment phase, the computationally costly discrete Gaussian sampling ($\mathbf{e}$) can happen on the server rather than the PUF (device) side.
+This requires that public key generation takes place on the device. In a LWE-based PKE, that requires implementing on the device the relatively expensive discrete Gaussian sampling mechanism. In contrast, a typical assumption of secure protocols utilizing PUF-based authentication is that during the \emph{enrollment phase}, secret information can be transferred in a secure manner. 
+With $\mathbf{s}$ securely transferred to the server side during the enrollment phase, the computationally costly discrete Gaussian sampling ($\mathbf{e}$) can happen on the server rather than the PUF (device) side.
 We highlight again that it is the availability of $\mathbf{s}$ on the server that enables challenge compression via distributional relaxation and the corresponding design improvements. 
 
-Once the discrete Gaussian sampling is done, the server generates and stores N blocks of CRP, as shown in Figure \ref{fig:protocol}.
-Each block shares the same LFSR seed, samples a string $\mathbf{r}$ with length $L$, a binary matrix $\mathbf{X}$ of dimension $m\times L$, and calculates a vector $\mathbf{b}^\prime$ of length $L$, in which $L$ is the length of PUF responses required by one authentication.  
+Each authentication transaction is based on getting a string of response bits of length $L$ from a PUF. 
+In the CRP generation phase, we use the challenge compression technique described in Section \ref{sec:lfsr}, to generate a single challenge $\mathbf{c}^\prime$ that produces an $L$-bit response string. 
+For clarity, we refer to such a challenge as an $L$-bit CRP in contrast to a basic single-bit output CRP discussed earlier. 
+The $L$-bit CRP generation starts from sampling a string $\mathbf{r}$ of length $L$, a starting seed $\text{seed}_{\mathbf{a}^\prime}$, and a binary matrix $\mathbf{X}$ of dimension $m\times L$ via a TRNG. 
+Next, $\text{seed}_{\mathbf{a}^\prime}$ is expanded by LFSR to a matrix of dimension $n\times L$ and a vector $\mathbf{b}^\prime$ of length $L$ is calculated accordingly. 
+The challenge of the $L$-bit CRP is $\mathbf{c}^\prime = (\text{seed}_{\mathbf{a}^\prime},\mathbf{b}^\prime)$.
+Finally, this L-bit CRP $(\mathbf{c}^\prime, \mathbf{r})$ is stored in DB. 
 
-During each authentication, the server sends a valid block of challenge  $ch=(\text{seed}_{\mathbf{a}^\prime}, \mathbf{b}')$ and a device-specific helper data to the device. 
-%The error correction uses the decoder of a concatenated code
-If the HD between $\mathbf{s}$ and $\mathbf{s}_R$ is within the error-decoding capability of the error correction code (ECC) decoder, the decoder reconstructs the correct secret key $\mathbf{s}$ (\texttt{FE.Rec}). 
-
-The device generates the PUF response $\mathbf{r}_R$ by executing the LWE decryption function with $(ch, \mathbf{s})$ and sends it back to the server. 
-%The above transaction is repeated for $n$ times in order to produce a $n$-bit string for authentication.
-%[OUR responses are one-bit. Need to DESCRIBE THE LENGTH OF THE STRING. OTHERWISE THE THRESHOLD BELOW DOESN'T MAKE SENSE]
-The server compares the $L$-bit $\mathbf{r}_R$ string with the corresponding $L$-bit $\mathbf{r}$ string stored in DB:
-the device is accepted if $\text{HD}(\mathbf{r}_R, \mathbf{r})$ is less than a given threshold $th$.
-%the device is accepted if $\text{HD}(\mathbf{r}_R \ \text{string}, \mathbf{r} \ \text{string})$ is less than a given threshold $th$.
+During each authentication transaction, the server sends a valid challenge $\mathbf{c}^\prime=(\text{seed}_{\mathbf{a}^\prime}, \mathbf{b}')$ of an $L$-bit CRP together with a device-specific helper data to the device. 
+To avoid device impersonation via replay, the CRPs are discarded after use. Therefore we limit the number of stored CRPs and authentications to $d$. The number $d$ is large enough so that an attacker cannot gather all CRPs and clone a device as such.
+If the HD between $\mathbf{s}$ and $\tilde{\mathbf{s}}$ is within the error-decoding capability of the error correction code (ECC) decoder, the decoder reconstructs the correct secret key $\mathbf{s}$ (\texttt{FE.Rec}). 
+The device then generates the PUF response string $\tilde{\mathbf{r}}$ by executing the LWE decryption function with $(\mathbf{c}^\prime, \mathbf{s})$ and sends it back to the server. 
+The server compares the $L$-bit $\tilde{\mathbf{r}}$ string with the corresponding $L$-bit $\mathbf{r}$ string stored in DB:
+the device is accepted if $\text{HD}(\tilde{\mathbf{r}}, \mathbf{r})$ is less than a given threshold $th$.
